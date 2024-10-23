@@ -1,22 +1,30 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+from flask_jwt_extended import JWTManager, jwt_required
 
 from services.database import Database
-from routes import signup
+from routes import signup, login
 
 app = Flask(__name__)
 
+app.config["JWT_SECRET_KEY"] = "bd-storedprocedures"  # Secreto para JWT
+jwt = JWTManager(app)
 CORS(app)
 
 db = Database()
 db.load_all_procedures()
 
 app.register_blueprint(signup)
+app.register_blueprint(login)
 
-@app.route('/helloworld')
+@app.route('/helloworld/public', methods=['GET'])
 def helloworld():
-  db = Database()
-  return { "message": "Hello World!" }
+  return { "message": "Hello Public World!" }
+
+@app.route('/helloworld/private', methods=['GET'])
+@jwt_required()
+def helloworld_private():
+  return { "message": "Hello Private World!" }
 
 # @app.route('/procedure/call', methods=['POST'])
 # def procedure():
