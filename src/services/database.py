@@ -73,7 +73,7 @@ class Database:
     db = self.connection()
     try:
       with db.cursor() as cursor:
-        sql = f"""
+        sql = """
           SELECT ROUTINE_NAME
           FROM information_schema.ROUTINES
           WHERE ROUTINE_TYPE = 'PROCEDURE' AND ROUTINE_SCHEMA = %s;
