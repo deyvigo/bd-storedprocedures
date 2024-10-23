@@ -21,15 +21,6 @@ class SignUpController:
 
     try:
       with db.cursor() as cursor:
-        # check if the username already exists
-        cursor.callproc('check_admin_username_exists', (data.username, 0))
-        cursor.execute('SELECT @_check_admin_username_exists_1 AS exists_flag;')
-        exists_flag = cursor.fetchone()['exists_flag']
-
-        if exists_flag:
-          return jsonify({ 'error': 'El usuario ya existe' }), 400
-
-        # then register the admin
         args = [
           data.nombre,
           data.apellido_pat,
@@ -42,20 +33,24 @@ class SignUpController:
           data.username,
           hashed_password,
           0,
-          0
+          0,
+          ''
         ]
-        cursor.callproc('post_admin', args)
-        cursor.execute('SELECT @_post_admin_10 AS rows_affected, @_post_admin_11 AS last_id;')
+        cursor.callproc('register_admin', args)
+        cursor.execute('SELECT @_register_admin_10 AS rows_affected, @_register_admin_11 AS last_id, @_register_admin_12 AS error_message;')
         result = cursor.fetchone()
         rows_affected = result['rows_affected']
         last_id = result['last_id']
-        db.commit()
+        error_message = result['error_message']
+        
+        if error_message:
+          return jsonify({ 'error': error_message }), 400
 
-      return jsonify({
-        'message': 'Admin registrado exitosamente',
-        'rows_affected': rows_affected,
-        'last_id': last_id
-      }), 201
+        return jsonify({
+          'message': 'Admin registrado exitosamente',
+          'rows_affected': rows_affected,
+          'last_id': last_id
+        }), 201
     except Exception as e:
       db.rollback()
       return jsonify({'error': f'No se pudo registrar el admin. {e}'}), 500
@@ -72,15 +67,6 @@ class SignUpController:
     hashed_password = bcrypt.generate_password_hash(data.password).decode('utf-8')
     try:
       with db.cursor() as cursor:
-        # check if the username already exists
-        cursor.callproc('check_cliente_username_exists', (data.username, 0))
-        cursor.execute('SELECT @_check_cliente_username_exists_1 AS exists_flag;')
-        exists_flag = cursor.fetchone()['exists_flag']
-
-        if exists_flag:
-          return jsonify({ 'error': 'El usuario ya existe' }), 400
-
-        # then register the client
         args = [
           data.nombre,
           data.apellido_pat,
@@ -93,20 +79,24 @@ class SignUpController:
           data.username,
           hashed_password,
           0,
-          0
+          0,
+          ''
         ]
-        cursor.callproc('post_cliente', args)
-        cursor.execute('SELECT @_post_cliente_10 AS rows_affected, @_post_cliente_11 AS last_id;')
+        cursor.callproc('register_cliente', args)
+        cursor.execute('SELECT @_register_cliente_10 AS rows_affected, @_register_cliente_11 AS last_id, @_register_cliente_12 AS error_message;')
         result = cursor.fetchone()
         rows_affected = result['rows_affected']
         last_id = result['last_id']
-        db.commit()
+        error_message = result['error_message']
 
-      return jsonify({
-        'message': 'Cliente registrado exitosamente',
-        'rows_affected': rows_affected,
-        'last_id': last_id
-      }), 201
+        if error_message:
+          return jsonify({ 'error': error_message }), 400
+
+        return jsonify({
+          'message': 'Cliente registrado exitosamente',
+          'rows_affected': rows_affected,
+          'last_id': last_id
+        }), 201
     except Exception as e:
       db.rollback()
       return jsonify({'error': f'No se pudo registrar el cliente. {e}'}), 500
