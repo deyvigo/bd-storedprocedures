@@ -1,22 +1,14 @@
--- Stored Procedure to get an admin by username
-CREATE PROCEDURE IF NOT EXISTS get_admin_by_username(
-  IN i_username varchar(50)
-)
-BEGIN
-  SELECT * FROM admin WHERE username = i_username;
-END;
-
-CREATE PROCEDURE IF NOT EXISTS check_admin_username_exists(
+CREATE PROCEDURE IF NOT EXISTS check_cliente_username_exists(
   IN  i_username      varchar(50),
   OUT exists_flag     boolean
 )
 BEGIN
   SELECT COUNT(*) > 0 INTO exists_flag
-  FROM admin
+  FROM cliente
   WHERE username = i_username;
 END;
 
-CREATE PROCEDURE IF NOT EXISTS post_admin(
+CREATE PROCEDURE IF NOT EXISTS post_cliente(
   IN  i_nombre           varchar(255),
   IN  i_apellido_pat     varchar(50),
   IN  i_apellido_mat     varchar(50),
@@ -31,7 +23,7 @@ CREATE PROCEDURE IF NOT EXISTS post_admin(
   OUT last_id            int
 )
 BEGIN
-  INSERT INTO admin (
+  INSERT INTO cliente (
     nombre, apellido_pat, apellido_mat, fecha_nacimiento, dni, sexo, telefono, correo, username, password
   )
   VALUES (
