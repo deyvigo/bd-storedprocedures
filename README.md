@@ -2,7 +2,7 @@ This is a project on Flask and MySQL using Stored Procedures.
 
 ## Install
 
-1. You make sure you have installed MySQL.
+1. Make sure you have installed MySQL.
 2. Create a database with any name.
 3. Create a .env file with the following content:
 
@@ -28,3 +28,5 @@ pip install -r requirements.txt
 ```bash
 python src/app.py
 ```
+
+### If you want to see the docs [Click here](docs.md)
