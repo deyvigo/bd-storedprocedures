@@ -68,3 +68,25 @@ class Database:
       db.rollback()
     finally:
       db.close()
+
+  def delete_all_procedures(self):
+    db = self.connection()
+    try:
+      with db.cursor() as cursor:
+        sql = f"""
+          SELECT ROUTINE_NAME
+          FROM information_schema.ROUTINES
+          WHERE ROUTINE_TYPE = 'PROCEDURE' AND ROUTINE_SCHEMA = %s;
+        """
+        db_name = os.getenv('DB_NAME')
+        cursor.execute(sql, (db_name,))
+        procs = cursor.fetchall()
+        if procs.__len__() > 0:
+          for proc in procs:
+            cursor.execute(f'DROP PROCEDURE {proc['ROUTINE_NAME']};')
+          db.commit()
+          print('Procedimientos eliminados')
+        else:
+          print('No hay procedimientos para eliminar')
+    except Exception as e:
+      print(f'Error durante la eliminación de los procedimientos: {e}')

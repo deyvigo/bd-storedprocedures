@@ -26,27 +26,10 @@ def helloworld():
 def helloworld_private():
   return { "message": "Hello Private World!" }
 
-# @app.route('/procedure/call', methods=['POST'])
-# def procedure():
-#   data = request.json
-#   procedure_name = data.get('procedure_name')
-#   arguments = data.get('args', [])
-
-#   if not procedure_name:
-#     return jsonify({ 'error': 'El nombre del procedimiento es obligatorio' }), 400
-
-#   query = f'CALL {procedure_name};'.replace('?', '%s')
-
-#   db = Database().connection()
-#   with db.cursor() as cursor:
-#     cursor.execute(query, arguments)
-#     results = { 'rows_affected': cursor.rowcount, 'last_id': cursor.lastrowid }
-
-#   db.commit()
-
-#   if results is not None:
-#     return jsonify(results), 200
-#   return jsonify({ 'error': 'No se pudo ejecutar el procedimiento' }), 500
+@app.route('/clear-procedures', methods=['GET'])
+def clear_procedures():
+  Database().delete_all_procedures()
+  return jsonify({ 'message': 'Procedimientos eliminados' }), 200
 
 if __name__ == '__main__':
   app.run(debug=True)
