@@ -18,12 +18,12 @@ BEGIN
 EXCEPTION
   WHEN unique_violation THEN
     rows_affected := 0;
-    error_message := 'El usuario ya existe';
+    error_message := 'El descuento ya existe';
     last_id := NULL;
     
   WHEN OTHERS THEN
     rows_affected := 0;
-    error_message := 'Error al registrar el usuario';
+    error_message := 'Error al registrar el descuento';
     last_id := NULL;
 END;
 $$ LANGUAGE plpgsql;
