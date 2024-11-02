@@ -42,6 +42,7 @@ BEGIN
   FROM descuento d
   WHERE d.id_descuento = i_id_descuento;
 END;
+$$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION get_descuento_all()
 RETURNS TABLE(
@@ -52,7 +53,6 @@ RETURNS TABLE(
   id_admin        INT
 ) AS $$
 BEGIN
-  RETURN QUERY
   SELECT d.id_descuento, d.codigo, d.monto, d.estado, d.id_admin
   FROM descuento d;
 END;

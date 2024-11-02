@@ -54,7 +54,10 @@ class Database:
           with open(os.path.join(dir_procedures_path, f_sql), 'r') as file:
             sql = file.read()
             if sql:
-              cursor.execute(sql)
+              try:
+                cursor.execute(sql)
+              except Exception as e:
+                print(f'Error en el procedimiento {f_sql}: {e}')
         db.commit()
         print('Procedimientos cargados')
     except Exception as e:
