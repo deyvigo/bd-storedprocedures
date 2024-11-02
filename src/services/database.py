@@ -1,6 +1,4 @@
-import pymysql
-import pymysql.cursors
-from pymysql.constants import CLIENT
+from psycopg2 import connect
 from dotenv import load_dotenv
 import os
 
@@ -11,7 +9,7 @@ class Database:
     db = self.connection()
     try:
       cursor = db.cursor()
-      cursor.execute('SHOW TABLES;')
+      cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';")
       tables = cursor.fetchall()
       if tables.__len__() > 0:
         print('Conexión: Base de datos ya está creada')
@@ -37,15 +35,11 @@ class Database:
       db.rollback()
 
   def connection(self):
-    db = pymysql.connections.Connection(
-      host=os.getenv('DB_HOST'),
+    db = connect(
+      database=os.getenv('DB_NAME'),
       user=os.getenv('DB_USER'),
       password=os.getenv('DB_PASSWORD'),
-      database=os.getenv('DB_NAME'),
-      port=int(os.getenv('DB_PORT')),
-      cursorclass= pymysql.cursors.DictCursor,
-      autocommit=False,
-      client_flag=CLIENT.MULTI_STATEMENTS
+      host=os.getenv('DB_HOST')
     )
     return db
 

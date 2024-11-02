@@ -21,6 +21,12 @@ class SignUpController:
 
     try:
       with db.cursor() as cursor:
+        cursor.callproc('get_admin_by_username', [data.username])
+        admin_on_db = cursor.fetchone()
+
+        if admin_on_db:
+          return jsonify({ 'error': 'El usuario ya existe' }), 400
+
         args = [
           data.nombre,
           data.apellido_pat,
@@ -31,20 +37,16 @@ class SignUpController:
           data.telefono,
           data.correo,
           data.username,
-          hashed_password,
-          0,
-          0,
-          ''
+          hashed_password
         ]
+
         cursor.callproc('register_admin', args)
-        cursor.execute('SELECT @_register_admin_10 AS rows_affected, @_register_admin_11 AS last_id, @_register_admin_12 AS error_message;')
+        db.commit()
         result = cursor.fetchone()
-        rows_affected = result['rows_affected']
-        last_id = result['last_id']
-        error_message = result['error_message']
+        last_id, rows_affected = result
         
-        if error_message:
-          return jsonify({ 'error': error_message }), 400
+        if rows_affected <= 0:
+          return jsonify({ 'error': 'No se pudo registrar al admin' }), 400
 
         return jsonify({
           'message': 'Admin registrado exitosamente',
@@ -67,6 +69,12 @@ class SignUpController:
     hashed_password = bcrypt.generate_password_hash(data.password).decode('utf-8')
     try:
       with db.cursor() as cursor:
+        cursor.callproc('get_cliente_by_username', [data.username])
+        cliente_on_db = cursor.fetchone()
+
+        if cliente_on_db:
+          return jsonify({ 'error': 'El usuario ya existe' }), 400
+        
         args = [
           data.nombre,
           data.apellido_pat,
@@ -77,21 +85,19 @@ class SignUpController:
           data.telefono,
           data.correo,
           data.username,
-          hashed_password,
-          0,
-          0,
-          ''
+          hashed_password
         ]
         cursor.callproc('register_cliente', args)
-        cursor.execute('SELECT @_register_cliente_10 AS rows_affected, @_register_cliente_11 AS last_id, @_register_cliente_12 AS error_message;')
         result = cursor.fetchone()
-        rows_affected = result['rows_affected']
-        last_id = result['last_id']
-        error_message = result['error_message']
+        print(result)
+        print(args)
+        last_id, rows_affected = result
 
-        if error_message:
-          return jsonify({ 'error': error_message }), 400
+        if rows_affected <= 0:
+          db.rollback()
+          return jsonify({ 'error': 'No se pudo registrar al cliente' }), 400
 
+        db.commit()
         return jsonify({
           'message': 'Cliente registrado exitosamente',
           'rows_affected': rows_affected,

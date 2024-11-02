@@ -1,216 +1,200 @@
-create table if not exists admin
+CREATE TABLE IF NOT EXISTS admin
 (
-  id_admin         int auto_increment
-    primary key,
-  nombre           varchar(255) not null,
-  apellido_pat     varchar(50)  not null,
-  apellido_mat     varchar(50)  not null,
-  fecha_nacimiento date         not null,
-  dni              varchar(8)   not null,
-  sexo             varchar(15)  not null,
-  telefono         varchar(20)  not null,
-  correo           varchar(255) not null,
-  username         varchar(50)  not null,
-  password         varchar(80)  not null
+  id_admin         serial PRIMARY KEY,
+  nombre           varchar(255) NOT NULL,
+  apellido_pat     varchar(50)  NOT NULL,
+  apellido_mat     varchar(50)  NOT NULL,
+  fecha_nacimiento date         NOT NULL,
+  dni              varchar(8)   NOT NULL,
+  sexo             varchar(15)  NOT NULL,
+  telefono         varchar(20)  NOT NULL,
+  correo           varchar(255) NOT NULL,
+  username         varchar(50)  NOT NULL,
+  password         varchar(80)  NOT NULL
 );
 
-create table if not exists chofer
+CREATE TABLE IF NOT EXISTS chofer
 (
-  id_chofer    int auto_increment
-    primary key,
-  nombre       varchar(255) not null,
-  apellido_pat varchar(50)  not null,
-  apellido_mat varchar(50)  not null,
-  sexo         varchar(15)  not null
+  id_chofer    serial PRIMARY KEY,
+  nombre       varchar(255) NOT NULL,
+  apellido_pat varchar(50)  NOT NULL,
+  apellido_mat varchar(50)  NOT NULL,
+  sexo         varchar(15)  NOT NULL
 );
 
-create table if not exists cliente
+CREATE TABLE IF NOT EXISTS cliente
 (
-  id_cliente       int auto_increment
-    primary key,
-  dni              varchar(8)   not null,
-  nombre           varchar(255) not null,
-  apellido_pat     varchar(50)  not null,
-  apellido_mat     varchar(50)  not null,
-  fecha_nacimiento date         not null,
-  sexo             varchar(15)  not null,
-  telefono         varchar(20)  not null,
-  correo           varchar(100) not null,
-  username         varchar(50)  not null,
-  password         varchar(80)  not null
+  id_cliente       serial PRIMARY KEY,
+  dni              varchar(8)   NOT NULL,
+  nombre           varchar(255) NOT NULL,
+  apellido_pat     varchar(50)  NOT NULL,
+  apellido_mat     varchar(50)  NOT NULL,
+  fecha_nacimiento date         NOT NULL,
+  sexo             varchar(15)  NOT NULL,
+  telefono         varchar(20)  NOT NULL,
+  correo           varchar(100) NOT NULL,
+  username         varchar(50)  NOT NULL,
+  password         varchar(80)  NOT NULL
 );
 
-create table if not exists descuento
+CREATE TABLE IF NOT EXISTS descuento
 (
-  id_descuento int auto_increment
-    primary key,
-  codigo       varchar(30)   not null,
-  monto        decimal(8, 2) not null,
-  estado       varchar(20)   not null,
-  id_admin     int           not null,
-  constraint descuento_admin_id_admin_fk
-    foreign key (id_admin) references admin (id_admin)
+  id_descuento serial PRIMARY KEY,
+  codigo       varchar(30)   NOT NULL,
+  monto        decimal(8, 2) NOT NULL,
+  estado       varchar(20)   NOT NULL,
+  id_admin     int           NOT NULL,
+  CONSTRAINT descuento_admin_id_admin_fk
+    FOREIGN KEY (id_admin) REFERENCES admin (id_admin)
 );
 
-create table if not exists metodo_pago
+CREATE TABLE IF NOT EXISTS metodo_pago
 (
-  id_metodo_pago    int auto_increment
-    primary key,
-  metodo            varchar(50) not null,
-  numero_tarjeta    varchar(16) not null,
-  cvv               varchar(3)  not null,
-  fecha_vencimiento varchar(5)  not null,
-  id_cliente        int         not null
+  id_metodo_pago    serial PRIMARY KEY,
+  metodo            varchar(50) NOT NULL,
+  numero_tarjeta    varchar(16) NOT NULL,
+  cvv               varchar(3)  NOT NULL,
+  fecha_vencimiento varchar(5)  NOT NULL,
+  id_cliente        int         NOT NULL
 );
 
-create table if not exists pasajero
+CREATE TABLE IF NOT EXISTS pasajero
 (
-  id_pasajero      int auto_increment
-    primary key,
-  dni              varchar(8)   not null,
-  nombre           varchar(255) not null,
-  apellido_pat     varchar(50)  not null,
-  apellido_mat     varchar(50)  not null,
-  fecha_nacimiento date         not null,
-  sexo             varchar(15)  not null
+  id_pasajero      serial PRIMARY KEY,
+  dni              varchar(8)   NOT NULL,
+  nombre           varchar(255) NOT NULL,
+  apellido_pat     varchar(50)  NOT NULL,
+  apellido_mat     varchar(50)  NOT NULL,
+  fecha_nacimiento date         NOT NULL,
+  sexo             varchar(15)  NOT NULL
 );
 
-create table if not exists terminal
+CREATE TABLE IF NOT EXISTS terminal
 (
-  id_terminal  int auto_increment
-    primary key,
-  nombre       varchar(255) not null,
-  departamento varchar(100) not null,
-  provincia    varchar(100) not null
+  id_terminal  serial PRIMARY KEY,
+  nombre       varchar(255) NOT NULL,
+  departamento varchar(100) NOT NULL,
+  provincia    varchar(100) NOT NULL
 );
 
-create table if not exists parada_intermedia
+CREATE TABLE IF NOT EXISTS parada_intermedia
 (
-  id_parada_intermedia int auto_increment
-    primary key,
-  ordinal              int not null,
-  id_terminal          int not null,
-  id_ruta              int not null,
-  constraint parada_intermedia_terminal_id_terminal_fk
-    foreign key (id_terminal) references terminal (id_terminal)
+  id_parada_intermedia serial PRIMARY KEY,
+  ordinal              int NOT NULL,
+  id_terminal          int NOT NULL,
+  id_ruta              int NOT NULL,
+  CONSTRAINT parada_intermedia_terminal_id_terminal_fk
+    FOREIGN KEY (id_terminal) REFERENCES terminal (id_terminal)
 );
 
-create table if not exists ruta
+CREATE TABLE IF NOT EXISTS ruta
 (
-  id_ruta           int auto_increment
-    primary key,
-  duracion_estimada time        not null,
-  distancia         double      not null,
-  estado            varchar(20) not null,
-  id_origen         int         not null,
-  id_destino        int         not null,
-  constraint ruta_terminal_id_terminal_fk
-    foreign key (id_origen) references terminal (id_terminal),
-  constraint ruta_terminal_id_terminal_fk_2
-    foreign key (id_destino) references terminal (id_terminal)
+  id_ruta           serial PRIMARY KEY,
+  duracion_estimada interval     NOT NULL,
+  distancia         double precision NOT NULL,
+  estado            varchar(20)  NOT NULL,
+  id_origen         int          NOT NULL,
+  id_destino        int          NOT NULL,
+  CONSTRAINT ruta_terminal_id_terminal_fk
+    FOREIGN KEY (id_origen) REFERENCES terminal (id_terminal),
+  CONSTRAINT ruta_terminal_id_terminal_fk_2
+    FOREIGN KEY (id_destino) REFERENCES terminal (id_terminal)
 );
 
-create table if not exists tipo_boleta
+CREATE TABLE IF NOT EXISTS tipo_boleta
 (
-  id_tipo_boleta int auto_increment
-    primary key,
-  tipo           varchar(20) not null
+  id_tipo_boleta serial PRIMARY KEY,
+  tipo           varchar(20) NOT NULL
 );
 
-create table if not exists tipo_servicio_bus
+CREATE TABLE IF NOT EXISTS tipo_servicio_bus
 (
-  id_tipo_servicio_bus int auto_increment
-    primary key,
-  servicio             varchar(50) not null
+  id_tipo_servicio_bus serial PRIMARY KEY,
+  servicio             varchar(50) NOT NULL
 );
 
-create table if not exists bus
+CREATE TABLE IF NOT EXISTS bus
 (
-  id_bus               int auto_increment
-    primary key,
-  asientos             int         not null,
-  placa                varchar(7)  not null,
-  marca                varchar(50) not null,
-  niveles              int         not null,
-  id_tipo_servicio_bus int         not null,
-  constraint bus_tipo_servicio_bus_id_tipo_servicio_bus_fk
-    foreign key (id_tipo_servicio_bus) references tipo_servicio_bus (id_tipo_servicio_bus)
+  id_bus               serial PRIMARY KEY,
+  asientos             int         NOT NULL,
+  placa                varchar(7)  NOT NULL,
+  marca                varchar(50) NOT NULL,
+  niveles              int         NOT NULL,
+  id_tipo_servicio_bus int         NOT NULL,
+  CONSTRAINT bus_tipo_servicio_bus_id_tipo_servicio_bus_fk
+    FOREIGN KEY (id_tipo_servicio_bus) REFERENCES tipo_servicio_bus (id_tipo_servicio_bus)
 );
 
-create table if not exists asiento
+CREATE TABLE IF NOT EXISTS asiento
 (
-  id_asiento int auto_increment
-    primary key,
-  nivel      int not null,
-  numero     int not null,
-  id_bus     int not null,
-  constraint asiento_bus_id_bus_fk
-    foreign key (id_bus) references bus (id_bus)
+  id_asiento serial PRIMARY KEY,
+  nivel      int NOT NULL,
+  numero     int NOT NULL,
+  id_bus     int NOT NULL,
+  CONSTRAINT asiento_bus_id_bus_fk
+    FOREIGN KEY (id_bus) REFERENCES bus (id_bus)
 );
 
-create table if not exists transaccion
+CREATE TABLE IF NOT EXISTS transaccion
 (
-  id_transaccion    int auto_increment
-    primary key,
-  precio_neto       decimal(8, 2) not null,
-  igv               decimal(8, 2) not null,
-  precio_total      decimal(8, 2) not null,
-  fecha_compra      datetime      not null,
-  ruc               varchar(20)   null,
-  correo_contacto   varchar(255)  not null,
-  telefono_contacto varchar(20)   not null,
-  id_cliente        int           not null,
-  id_descuento      int           not null,
-  id_tipo_boleta    int           not null,
-  constraint transaccion_cliente_id_cliente_fk
-    foreign key (id_cliente) references cliente (id_cliente),
-  constraint transaccion_descuento_id_descuento_fk
-    foreign key (id_descuento) references descuento (id_descuento),
-  constraint transaccion_tipo_boleta_id_tipo_boleta_fk
-    foreign key (id_tipo_boleta) references tipo_boleta (id_tipo_boleta)
+  id_transaccion    serial PRIMARY KEY,
+  precio_neto       decimal(8, 2) NOT NULL,
+  igv               decimal(8, 2) NOT NULL,
+  precio_total      decimal(8, 2) NOT NULL,
+  fecha_compra      timestamp     NOT NULL,
+  ruc               varchar(20)   NULL,
+  correo_contacto   varchar(255)  NOT NULL,
+  telefono_contacto varchar(20)   NOT NULL,
+  id_cliente        int           NOT NULL,
+  id_descuento      int           NOT NULL,
+  id_tipo_boleta    int           NOT NULL,
+  CONSTRAINT transaccion_cliente_id_cliente_fk
+    FOREIGN KEY (id_cliente) REFERENCES cliente (id_cliente),
+  CONSTRAINT transaccion_descuento_id_descuento_fk
+    FOREIGN KEY (id_descuento) REFERENCES descuento (id_descuento),
+  CONSTRAINT transaccion_tipo_boleta_id_tipo_boleta_fk
+    FOREIGN KEY (id_tipo_boleta) REFERENCES tipo_boleta (id_tipo_boleta)
 );
 
-create table if not exists viaje_programado
+CREATE TABLE IF NOT EXISTS viaje_programado
 (
-  id_viaje_programado int auto_increment
-    primary key,
-  fecha_salida        date          not null,
-  hora_salida         time          not null,
-  precio_nivel_uno    decimal(8, 2) not null,
-  precio_nivel_dos    decimal(8, 2) not null,
-  asientos_ocupados   int           not null,
-  id_ruta             int           not null,
-  id_bus              int           not null,
-  id_admin_created    int           not null,
-  id_chofer           int           not null,
-  constraint viaje_programado_chofer_id_chofer_fk
-    foreign key (id_chofer) references chofer (id_chofer),
-  constraint viaje_programado_ruta_id_ruta_fk
-    foreign key (id_ruta) references ruta (id_ruta)
+  id_viaje_programado serial PRIMARY KEY,
+  fecha_salida        date          NOT NULL,
+  hora_salida         time          NOT NULL,
+  precio_nivel_uno    decimal(8, 2) NOT NULL,
+  precio_nivel_dos    decimal(8, 2) NOT NULL,
+  asientos_ocupados   int           NOT NULL,
+  id_ruta             int           NOT NULL,
+  id_bus              int           NOT NULL,
+  id_admin_created    int           NOT NULL,
+  id_chofer           int           NOT NULL,
+  CONSTRAINT viaje_programado_chofer_id_chofer_fk
+    FOREIGN KEY (id_chofer) REFERENCES chofer (id_chofer),
+  CONSTRAINT viaje_programado_ruta_id_ruta_fk
+    FOREIGN KEY (id_ruta) REFERENCES ruta (id_ruta)
 );
 
-create table if not exists pasaje
+CREATE TABLE IF NOT EXISTS pasaje
 (
-  id_pasaje           int auto_increment
-    primary key,
-  fecha_compra        datetime      not null,
-  precio_neto         decimal(8, 2) not null,
-  igv                 decimal(8, 2) not null,
-  precio_total        decimal(8, 2) not null,
-  id_pasajero         int           null,
-  id_asiento          int           not null,
-  id_viaje_programado int           not null,
-  id_transaccion      int           not null,
-  fecha_modificacion  datetime      null,
-  id_admin_mod        int           null,
-  constraint pasaje_admin_id_admin_fk
-    foreign key (id_admin_mod) references admin (id_admin),
-  constraint pasaje_asiento_id_asiento_fk
-    foreign key (id_asiento) references asiento (id_asiento),
-  constraint pasaje_pasajero_id_pasajero_fk
-    foreign key (id_pasajero) references pasajero (id_pasajero),
-  constraint pasaje_transaccion_id_transaccion_fk
-    foreign key (id_transaccion) references transaccion (id_transaccion),
-  constraint pasaje_viaje_programado_id_viaje_programado_fk
-    foreign key (id_viaje_programado) references viaje_programado (id_viaje_programado)
+  id_pasaje           serial PRIMARY KEY,
+  fecha_compra        timestamp     NOT NULL,
+  precio_neto         decimal(8, 2) NOT NULL,
+  igv                 decimal(8, 2) NOT NULL,
+  precio_total        decimal(8, 2) NOT NULL,
+  id_pasajero         int           NULL,
+  id_asiento          int           NOT NULL,
+  id_viaje_programado int           NOT NULL,
+  id_transaccion      int           NOT NULL,
+  fecha_modificacion  timestamp     NULL,
+  id_admin_mod        int           NULL,
+  CONSTRAINT pasaje_admin_id_admin_fk
+    FOREIGN KEY (id_admin_mod) REFERENCES admin (id_admin),
+  CONSTRAINT pasaje_asiento_id_asiento_fk
+    FOREIGN KEY (id_asiento) REFERENCES asiento (id_asiento),
+  CONSTRAINT pasaje_pasajero_id_pasajero_fk
+    FOREIGN KEY (id_pasajero) REFERENCES pasajero (id_pasajero),
+  CONSTRAINT pasaje_transaccion_id_transaccion_fk
+    FOREIGN KEY (id_transaccion) REFERENCES transaccion (id_transaccion),
+  CONSTRAINT pasaje_viaje_programado_id_viaje_programado_fk
+    FOREIGN KEY (id_viaje_programado) REFERENCES viaje_programado (id_viaje_programado)
 );
