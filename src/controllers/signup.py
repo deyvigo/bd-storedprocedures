@@ -40,15 +40,16 @@ class SignUpController:
           data.username,
           hashed_password,
           0,
-          0
+          0,
+          ''
         ]
 
-        cursor.execute("CALL sp_register_admin(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);", args)
+        cursor.execute("CALL sp_register_admin(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);", args)
         result = cursor.fetchone()
 
-        if not result:
+        if result and result["error_message"]:
           db.rollback()
-          return { "error": "No se pudo registrar al admin" }, 200
+          return jsonify({ 'error': result["error_message"] }), 409
         
         last_id, rows_affected = result["last_id"], result["rows_affected"]
         
@@ -65,6 +66,8 @@ class SignUpController:
     except Exception as e:
       db.rollback()
       return jsonify({'error': f'No se pudo registrar al admin. {e}'}), 500
+    finally:
+      db.close()
 
   @staticmethod
   def signup_client():
@@ -96,14 +99,15 @@ class SignUpController:
           data.username,
           hashed_password,
           0,
-          0
+          0,
+          ''
         ]
-        cursor.execute("CALL sp_register_cliente(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);", args)
+        cursor.execute("CALL sp_register_cliente(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);", args)
         result = cursor.fetchone()
 
-        if not result:
+        if result and result["error_message"]:
           db.rollback()
-          return { "error": "No se pudo registrar al cliente" }, 200
+          return { "error": result["error_message"] }, 409
         
         last_id, rows_affected = result["last_id"], result["rows_affected"]
 
@@ -120,4 +124,6 @@ class SignUpController:
     except Exception as e:
       db.rollback()
       return jsonify({'error': f'No se pudo registrar el cliente. {e}'}), 500
+    finally:
+      db.close()
 

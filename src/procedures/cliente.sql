@@ -31,8 +31,9 @@ CREATE OR REPLACE PROCEDURE sp_register_cliente(
   i_correo           VARCHAR,
   i_username         VARCHAR,
   i_password         VARCHAR,
-  OUT last_id INT,
-  OUT rows_affected INT
+  OUT last_id        INT,
+  OUT rows_affected  INT,
+  OUT error_message  VARCHAR
 )
 AS $$
 BEGIN
@@ -41,5 +42,39 @@ BEGIN
   RETURNING id_cliente INTO last_id;
 
   GET DIAGNOSTICS rows_affected = ROW_COUNT;
+  error_message := NULL;
+
+EXCEPTION
+  WHEN unique_violation THEN
+    rows_affected := 0;
+    error_message := 'Alguno de los campos del cliente ya existe';
+    last_id := NULL;
+    
+  WHEN OTHERS THEN
+    rows_affected := 0;
+    error_message := 'Error desconocido en cliente table' || SQLERRM;
+    last_id := NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION get_cliente_by_id(i_id_cliente INT)
+RETURNS TABLE(
+  id_cliente       INT,
+  nombre           VARCHAR,
+  apellido_pat     VARCHAR,
+  apellido_mat     VARCHAR,
+  fecha_nacimiento DATE,
+  dni              VARCHAR,
+  sexo             VARCHAR,
+  telefono         VARCHAR,
+  correo           VARCHAR,
+  username         VARCHAR,
+  password         VARCHAR
+) AS $$
+BEGIN
+  RETURN QUERY
+  SELECT c.id_cliente, c.nombre, c.apellido_pat, c.apellido_mat, c.fecha_nacimiento, c.dni, c.sexo, c.telefono, c.correo, c.username, c.password
+  FROM cliente c
+  WHERE c.id_cliente = i_id_cliente;
 END;
 $$ LANGUAGE plpgsql;

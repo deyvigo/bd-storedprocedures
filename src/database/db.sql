@@ -8,8 +8,8 @@ CREATE TABLE IF NOT EXISTS admin
   dni              varchar(8)   NOT NULL,
   sexo             varchar(15)  NOT NULL,
   telefono         varchar(20)  NOT NULL,
-  correo           varchar(255) NOT NULL,
-  username         varchar(50)  NOT NULL,
+  correo           varchar(255) NOT NULL UNIQUE,
+  username         varchar(50)  NOT NULL UNIQUE,
   password         varchar(80)  NOT NULL
 );
 
@@ -32,8 +32,8 @@ CREATE TABLE IF NOT EXISTS cliente
   fecha_nacimiento date         NOT NULL,
   sexo             varchar(15)  NOT NULL,
   telefono         varchar(20)  NOT NULL,
-  correo           varchar(100) NOT NULL,
-  username         varchar(50)  NOT NULL,
+  correo           varchar(100) NOT NULL UNIQUE,
+  username         varchar(50)  NOT NULL UNIQUE,
   password         varchar(80)  NOT NULL
 );
 
