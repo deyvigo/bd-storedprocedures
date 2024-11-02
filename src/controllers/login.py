@@ -3,6 +3,7 @@ from pydantic import ValidationError
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import create_access_token
 from datetime import timedelta
+from psycopg2.extras import RealDictCursor
 
 from dto.loginDTO import AdminLoginDTO, ClientLoginDTO
 from dto.adminDTO import AdminDTO
@@ -22,7 +23,7 @@ class LoginController:
     db = Database().connection()
 
     try:
-      with db.cursor() as cursor:
+      with db.cursor(cursor_factory=RealDictCursor) as cursor:
         args = [data.username]
         cursor.callproc('get_admin_by_username', args)
         response = cursor.fetchone()
@@ -59,7 +60,7 @@ class LoginController:
     db = Database().connection()
 
     try:
-      with db.cursor() as cursor:
+      with db.cursor(cursor_factory=RealDictCursor) as cursor:
         args = [data.username]
         cursor.callproc('get_cliente_by_username', args)
         response = cursor.fetchone()
