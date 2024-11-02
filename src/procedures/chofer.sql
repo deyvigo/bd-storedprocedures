@@ -13,6 +13,8 @@ BEGIN
   RETURNING id_chofer INTO last_id;
 
   GET DIAGNOSTICS rows_affected = ROW_COUNT;
+  error_message := NULL;
+
 EXCEPTION
   WHEN unique_violation THEN
     rows_affected := 0;
