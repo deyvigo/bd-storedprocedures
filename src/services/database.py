@@ -68,16 +68,17 @@ class Database:
     try:
       with db.cursor() as cursor:
         sql = """
-          SELECT ROUTINE_NAME
-          FROM information_schema.ROUTINES
-          WHERE ROUTINE_TYPE = 'PROCEDURE' AND ROUTINE_SCHEMA = %s;
+          SELECT proname
+          FROM pg_proc
+          JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+          WHERE pg_namespace.nspname = 'public';
         """
-        db_name = os.getenv('DB_NAME')
-        cursor.execute(sql, (db_name,))
+        cursor.execute(sql)
         procs = cursor.fetchall()
         if procs.__len__() > 0:
-          for proc in procs:
-            cursor.execute(f'DROP PROCEDURE {proc['ROUTINE_NAME']};')
+          for procname in procs:
+            cursor.execute(f'DROP PROCEDURE IF EXISTS {procname[0]};')
+            cursor.execute(f'DROP FUNCTION IF EXISTS {procname[0]};')
           db.commit()
           print('Procedimientos eliminados')
         else:

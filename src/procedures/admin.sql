@@ -20,7 +20,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION register_admin(
+CREATE OR REPLACE PROCEDURE sp_register_admin(
   i_nombre           VARCHAR,
   i_apellido_pat     VARCHAR,
   i_apellido_mat     VARCHAR,
@@ -30,20 +30,17 @@ CREATE OR REPLACE FUNCTION register_admin(
   i_telefono         VARCHAR,
   i_correo           VARCHAR,
   i_username         VARCHAR,
-  i_password         VARCHAR
+  i_password         VARCHAR,
+  OUT last_id INT,
+  OUT rows_affected INT
 )
-RETURNS TABLE(last_id INT, rows_affected INT) AS $$
-DECLARE
-  last_id INT;
-  rows_affected INT;
+AS $$
 BEGIN
   INSERT INTO admin (nombre, apellido_pat, apellido_mat, fecha_nacimiento, dni, sexo, telefono, correo, username, password)
   VALUES (i_nombre, i_apellido_pat, i_apellido_mat, i_fecha_nacimiento, i_dni, i_sexo, i_telefono, i_correo, i_username, i_password)
   RETURNING id_admin INTO last_id;
 
   GET DIAGNOSTICS rows_affected = ROW_COUNT;
-
-  RETURN QUERY SELECT last_id, rows_affected;
 END;
 $$ LANGUAGE plpgsql;
 

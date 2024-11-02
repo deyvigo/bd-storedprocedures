@@ -1,6 +1,7 @@
 from flask import request, jsonify
 from pydantic import ValidationError
 from flask_bcrypt import Bcrypt
+from psycopg2.extras import RealDictCursor
 
 from dto.signupDTO import AdminSignUpDTO, ClientSignUpDTO
 from services.database import Database
@@ -20,7 +21,7 @@ class SignUpController:
     hashed_password = bcrypt.generate_password_hash(data.password).decode('utf-8')
 
     try:
-      with db.cursor() as cursor:
+      with db.cursor(cursor_factory=RealDictCursor) as cursor:
         cursor.callproc('get_admin_by_username', [data.username])
         admin_on_db = cursor.fetchone()
 
@@ -37,17 +38,25 @@ class SignUpController:
           data.telefono,
           data.correo,
           data.username,
-          hashed_password
+          hashed_password,
+          0,
+          0
         ]
 
-        cursor.callproc('register_admin', args)
-        db.commit()
+        cursor.execute("CALL sp_register_admin(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);", args)
         result = cursor.fetchone()
-        last_id, rows_affected = result
+
+        if not result:
+          db.rollback()
+          return { "error": "No se pudo registrar al admin" }, 200
+        
+        last_id, rows_affected = result["last_id"], result["rows_affected"]
         
         if rows_affected <= 0:
+          db.rollback()
           return jsonify({ 'error': 'No se pudo registrar al admin' }), 400
 
+        db.commit()
         return jsonify({
           'message': 'Admin registrado exitosamente',
           'rows_affected': rows_affected,
@@ -55,7 +64,7 @@ class SignUpController:
         }), 201
     except Exception as e:
       db.rollback()
-      return jsonify({'error': f'No se pudo registrar el admin. {e}'}), 500
+      return jsonify({'error': f'No se pudo registrar al admin. {e}'}), 500
 
   @staticmethod
   def signup_client():
@@ -68,7 +77,7 @@ class SignUpController:
 
     hashed_password = bcrypt.generate_password_hash(data.password).decode('utf-8')
     try:
-      with db.cursor() as cursor:
+      with db.cursor(cursor_factory=RealDictCursor) as cursor:
         cursor.callproc('get_cliente_by_username', [data.username])
         cliente_on_db = cursor.fetchone()
 
@@ -85,13 +94,18 @@ class SignUpController:
           data.telefono,
           data.correo,
           data.username,
-          hashed_password
+          hashed_password,
+          0,
+          0
         ]
-        cursor.callproc('register_cliente', args)
+        cursor.execute("CALL sp_register_cliente(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);", args)
         result = cursor.fetchone()
-        print(result)
-        print(args)
-        last_id, rows_affected = result
+
+        if not result:
+          db.rollback()
+          return { "error": "No se pudo registrar al cliente" }, 200
+        
+        last_id, rows_affected = result["last_id"], result["rows_affected"]
 
         if rows_affected <= 0:
           db.rollback()
