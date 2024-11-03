@@ -18,7 +18,8 @@ BEGIN
   END;
   
   START TRANSACTION;
-  INSERT INTO metodo_pago (metodo, numero_tarjeta, cvv, fecha_vencimiento, id_cliente) VALUES (i_metodo, i_numero_tarjeta, i_cvv, i_fecha_vencimiento, i_id_cliente);
+  INSERT INTO metodo_pago (metodo, numero_tarjeta, cvv, fecha_vencimiento, id_cliente)
+  VALUES (i_metodo, i_numero_tarjeta, i_cvv, i_fecha_vencimiento, i_id_cliente);
   SET rows_affected = ROW_COUNT();
   SET last_id = LAST_INSERT_ID();
   SET error_message = NULL;
