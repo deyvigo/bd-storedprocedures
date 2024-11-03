@@ -24,7 +24,7 @@ class LoginController:
     try:
       with db.cursor() as cursor:
         args = [data.username]
-        cursor.callproc('get_admin_by_username', args)
+        cursor.callproc('sp_get_admin_by_username', args)
         response = cursor.fetchone()
 
         if not response:
@@ -61,7 +61,7 @@ class LoginController:
     try:
       with db.cursor() as cursor:
         args = [data.username]
-        cursor.callproc('get_cliente_by_username', args)
+        cursor.callproc('sp_get_cliente_by_username', args)
         response = cursor.fetchone()
 
         if not response:

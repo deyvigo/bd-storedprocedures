@@ -36,8 +36,8 @@ class SignUpController:
           0,
           ''
         ]
-        cursor.callproc('register_admin', args)
-        cursor.execute('SELECT @_register_admin_10 AS rows_affected, @_register_admin_11 AS last_id, @_register_admin_12 AS error_message;')
+        cursor.callproc('sp_register_admin', args)
+        cursor.execute('SELECT @_sp_register_admin_10 AS rows_affected, @_sp_register_admin_11 AS last_id, @_sp_register_admin_12 AS error_message;')
         result = cursor.fetchone()
         rows_affected = result['rows_affected']
         last_id = result['last_id']
@@ -82,8 +82,8 @@ class SignUpController:
           0,
           ''
         ]
-        cursor.callproc('register_cliente', args)
-        cursor.execute('SELECT @_register_cliente_10 AS rows_affected, @_register_cliente_11 AS last_id, @_register_cliente_12 AS error_message;')
+        cursor.callproc('sp_register_cliente', args)
+        cursor.execute('SELECT @_sp_register_cliente_10 AS rows_affected, @_sp_register_cliente_11 AS last_id, @_sp_register_cliente_12 AS error_message;')
         result = cursor.fetchone()
         rows_affected = result['rows_affected']
         last_id = result['last_id']

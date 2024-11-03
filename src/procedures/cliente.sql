@@ -1,11 +1,11 @@
-CREATE PROCEDURE IF NOT EXISTS get_cliente_by_username(
+CREATE PROCEDURE IF NOT EXISTS sp_get_cliente_by_username(
   IN i_username varchar(50)
 )
 BEGIN
   SELECT * FROM cliente WHERE username = i_username;
 END;
 
-CREATE PROCEDURE IF NOT EXISTS register_cliente(
+CREATE PROCEDURE IF NOT EXISTS sp_register_cliente(
   IN  i_nombre           varchar(255),
   IN  i_apellido_pat     varchar(50),
   IN  i_apellido_mat     varchar(50),
