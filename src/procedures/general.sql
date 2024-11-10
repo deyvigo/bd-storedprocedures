@@ -18,11 +18,11 @@ BEGIN
     SELECT 
         t_origen.nombre AS origen, 
         t_destino.nombre AS destino, 
-        tsb.tipo_servicio AS servicio, 
+        tsb.servicio AS servicio, 
         vp.fecha_salida AS fecha_salida, 
         vp.hora_salida AS hora_salida, 
         (vp.hora_salida+r.duracion_estimada) AS hora_llegada,
-        vp.minutos_salida AS duracion, 
+        r.duracion_estimada AS duracion, 
         vp.precio_nivel_uno AS precio_min, 
         (b.asientos-vp.asientos_ocupados) AS asientos_disponibles, 
         r.duracion_estimada AS duracion, r.distancia AS distancia 
@@ -35,7 +35,7 @@ BEGIN
     WHERE t_origen.departamento = i_origen
     AND t_destino.departamento = i_destino
     AND vp.fecha_salida = i_fecha
-    AND (ab.asientos-vp.asientos_ocupados) > 0;
+    AND (b.asientos-vp.asientos_ocupados) > 0;
 END;
 
 CREATE PROCEDURE IF NOT EXISTS sp_get_seat_by_trip(
@@ -46,10 +46,13 @@ BEGIN
         a.id_asiento,
         a.nivel,
         a.numero,
+        IF(a.nivel = 1, vp.precio_nivel_uno, vp.precio_nivel_dos) AS precio,
         IF(p.id_pasaje IS NULL, 'Disponible', 'Ocupado') AS estado
     FROM asiento a
     LEFT JOIN pasaje p ON a.id_asiento = p.id_asiento 
-    AND p.id_viaje_programado = i_id_viaje_programado
-    WHERE 
-        a.id_bus = (SELECT id_bus FROM viaje_programado WHERE id_viaje_programado = i_id_viaje_programado);
+        AND p.id_viaje_programado = i_id_viaje_programado
+    INNER JOIN viaje_programado vp ON vp.id_viaje_programado = i_id_viaje_programado
+    WHERE a.id_bus = (SELECT id_bus 
+                      FROM viaje_programado 
+                      WHERE id_viaje_programado = i_id_viaje_programado);
 END;

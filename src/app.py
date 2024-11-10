@@ -31,5 +31,11 @@ def clear_procedures():
   Database().delete_all_procedures()
   return jsonify({ 'message': 'Procedimientos eliminados' }), 200
 
+@app.route('/reload-procedures', methods=['GET'])
+def reload_procedures():
+  Database().delete_all_procedures()
+  Database().load_all_procedures()
+  return jsonify({ 'message': 'Procedimientos actualizados' }), 200
+
 if __name__ == '__main__':
   app.run(debug=True)
