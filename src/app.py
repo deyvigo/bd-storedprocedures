@@ -31,5 +31,10 @@ def clear_procedures():
   Database().delete_all_procedures()
   return jsonify({ 'message': 'Procedimientos eliminados' }), 200
 
+@app.route('/load-triggers', methods=['GET'])
+def load_triggers():
+  Database().create_triggers()
+  return jsonify({ 'message': 'Triggers creados' }), 200
+
 if __name__ == '__main__':
   app.run(debug=True)

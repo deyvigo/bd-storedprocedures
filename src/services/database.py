@@ -93,3 +93,24 @@ class Database:
           print('No hay procedimientos para eliminar')
     except Exception as e:
       print(f'Error durante la eliminación de los procedimientos: {e}')
+
+  def create_triggers(self):
+    db = self.connection()
+    try:
+      with db.cursor() as cursor:
+        cursor.execute("""
+          CREATE TRIGGER IF NOT EXISTS update_occuped_seats
+          AFTER INSERT ON pasaje
+          FOR EACH ROW
+          BEGIN
+            UPDATE viaje_programado
+            SET asientos_ocupados = asientos_ocupados + 1
+            WHERE id_viaje_programado = NEW.id_viaje_programado;
+          END;
+        """)
+
+    except Exception as e:
+      print(f'Error durante la creación de los triggers: {e}')
+      db.rollback()
+    finally:
+      db.close()

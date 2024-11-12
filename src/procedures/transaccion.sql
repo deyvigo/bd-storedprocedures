@@ -16,8 +16,9 @@ CREATE PROCEDURE IF NOT EXISTS sp_register_transaccion(
 BEGIN
   DECLARE EXIT HANDLER FOR SQLEXCEPTION
   BEGIN
+    GET DIAGNOSTICS CONDITION 1
+      error_message = MESSAGE_TEXT;
     SET rows_affected = -1;
-    SET error_message = 'Error al intentar registrar la transaccion';
     SET last_id = -1;
     ROLLBACK;
   END;

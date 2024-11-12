@@ -1,4 +1,6 @@
 from faker import Faker
+from pymysql.cursors import DictCursor
+from decimal import Decimal
 import string
 
 from flask_bcrypt import Bcrypt 
@@ -96,8 +98,9 @@ for _ in range(n_drivers):
   nombre = fake.first_name()
   apellido_pat = fake.last_name()
   apellido_mat = fake.last_name()
+  dni = fake.ean(length=8)
   sexo = fake.random_element(['masculino', 'femenino'])
-  args = [nombre, apellido_pat, apellido_mat, sexo, 0, 0, '']
+  args = [nombre, apellido_pat, apellido_mat, dni, sexo, 0, 0, '']
   with db.cursor() as cursor:
     cursor.callproc("sp_register_chofer", args)
 
@@ -119,6 +122,7 @@ for i in range(4):
       cursor.callproc("sp_register_viaje_programado", args)
 
 # pasengers
+passengers = []
 n_pasajeros = 300
 
 for _ in range(n_pasajeros):
@@ -129,5 +133,118 @@ for _ in range(n_pasajeros):
   fecha_nacimiento = fake.date_between(start_date='-70y', end_date='-10y')
   sexo = fake.random_element(['masculino', 'femenino'])
   args = [dni, nombre, apellido_pat, apellido_mat, fecha_nacimiento, sexo, 0, 0, '']
+  passengers.append(args)
+
+# type of billets
+with db.cursor() as cursor:
+  cursor.callproc("sp_register_tipo_boleta", ["normal", 0, 0, ''])
+
+# trips, buses and seats to be used in the simulation
+trips = {}
+
+with db.cursor(cursor=DictCursor) as cursor:
+  cursor.execute("SELECT * FROM viaje_programado")
+  trips = cursor.fetchall()
+
+# clients
+n_clients = 40
+for _ in range(n_clients):
+  nombre = fake.first_name()
+  apellido_pat = fake.last_name()
+  apellido_mat = fake.last_name()
+  fecha_nacimiento = fake.date_between(start_date='-70y', end_date='-10y')
+  dni = fake.ean(length=8)
+  sexo = fake.random_element(['masculino', 'femenino'])
+  telefono = fake.numerify("9########")
+  correo = fake.email()
+  username = f'cliente{_ + 1}'
+  password = bcrypt.generate_password_hash('12345678').decode('utf-8')
+  args = [nombre, apellido_pat, apellido_mat, fecha_nacimiento, dni, sexo, telefono, correo, username, password, 0, 0, '']
   with db.cursor() as cursor:
-    cursor.callproc("sp_register_pasajero", args)
+    cursor.callproc("sp_register_cliente", args)
+
+id_transaccion = 1
+# transactions: 1-4 per client
+for i in range(n_clients):
+  id_cliente = i + 1
+  transactions = fake.random_element([1, 2, 3, 4])
+
+  for _ in range(transactions):
+    # create transaction
+    fecha_compra = fake.date_between(start_date='-10d', end_date='now')
+    ruc = fake.random_number(digits=11, fix_len=True)
+    correo_contacto = fake.email()
+    telefono_contacto = fake.numerify("9########")
+    args = [0, 0, 0, fecha_compra, ruc, correo_contacto, telefono_contacto, id_cliente, None, 1, 0, 0, '']
+    with db.cursor() as cursor:
+      cursor.callproc("sp_register_transaccion", args)
+    
+    # details -> pasaje only one passenger
+    details = fake.random_element([1, 2, 3, 4])
+    for _ in range(details):
+      
+      # select viaje_programado
+      viaje_programado = fake.random_element(trips)
+      id_viaje_programado = viaje_programado['id_viaje_programado']
+
+      passenger_args = fake.random_element(passengers)
+      # search and create if not exists
+      passenger = None
+      with db.cursor() as cursor:
+        cursor.execute(f"SELECT * FROM pasajero WHERE dni = '{passenger_args[0]}'")
+        passenger = cursor.fetchone()
+        if not passenger:
+          cursor.callproc("sp_register_pasajero", passenger_args)
+          cursor.execute(f"SELECT * FROM pasajero WHERE dni = '{passenger_args[0]}'")
+          passenger = cursor.fetchone()
+      
+      id_pasajero = passenger['id_pasajero']
+      # get all free seats
+      free_seats = []
+      with db.cursor() as cursor:
+        cursor.execute(f"""
+          SELECT a.*
+          FROM asiento a
+          INNER JOIN viaje_programado vp ON a.id_bus = vp.id_bus
+          LEFT JOIN pasaje p ON a.id_asiento = p.id_asiento
+          WHERE a.id_bus = {viaje_programado['id_bus']} AND vp.id_viaje_programado = {viaje_programado['id_viaje_programado']} AND p.id_pasaje IS NULL;
+        """)
+        free_seats = cursor.fetchall()
+      if not free_seats:
+        print(f'No hay asientos libres para el viaje {viaje_programado["id_viaje_programado"]}')
+        continue
+      # select a random seat
+      seat = fake.random_element(free_seats)
+      # check position of the seat
+      nivel = seat['nivel']
+      precio_total = 0
+      if nivel == 1:
+        precio_total = viaje_programado['precio_nivel_uno']
+      elif nivel == 2:
+        precio_total = viaje_programado['precio_nivel_dos']
+      
+      igv = precio_total * Decimal('0.18')
+      precio_neto = precio_total - igv
+
+      detail_args = [fecha_compra, precio_neto, igv, precio_total, id_pasajero, seat['id_asiento'], id_viaje_programado, id_transaccion, None, None, 0, 0, '']
+      with db.cursor() as cursor:
+        cursor.callproc("sp_register_pasaje", detail_args)
+        # update transaction prices
+        cursor.execute(f"""
+          UPDATE transaccion 
+          SET precio_neto = precio_neto + {precio_neto},
+              precio_total = precio_total + {precio_total},
+              igv = igv + {igv}
+          WHERE id_transaccion = {id_transaccion};
+        """)
+        # update seats occupation with trigger
+        cursor.execute(f"""
+          UPDATE viaje_programado
+          SET asientos_ocupados = asientos_ocupados + 1
+          WHERE id_viaje_programado = {id_viaje_programado};
+        """)
+
+    id_transaccion += 1
+
+print("Base de datos rellenada con datos de ejemplo")
+

@@ -21,6 +21,7 @@ create table if not exists chofer
   nombre       varchar(255) not null,
   apellido_pat varchar(50)  not null,
   apellido_mat varchar(50)  not null,
+  dni          varchar(8)   not null,
   sexo         varchar(15)  not null
 );
 
@@ -58,7 +59,6 @@ create table if not exists metodo_pago
     primary key,
   metodo            varchar(50) not null,
   numero_tarjeta    varchar(16) not null,
-  cvv               varchar(3)  not null,
   fecha_vencimiento varchar(5)  not null,
   id_cliente        int         not null
 );
@@ -160,7 +160,7 @@ create table if not exists transaccion
   correo_contacto   varchar(255)  not null,
   telefono_contacto varchar(20)   not null,
   id_cliente        int           not null,
-  id_descuento      int           not null,
+  id_descuento      int               null,
   id_tipo_boleta    int           not null,
   constraint transaccion_cliente_id_cliente_fk
     foreign key (id_cliente) references cliente (id_cliente),
