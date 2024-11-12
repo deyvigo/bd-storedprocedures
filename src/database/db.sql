@@ -57,9 +57,8 @@ create table if not exists metodo_pago
 (
   id_metodo_pago    int auto_increment
     primary key,
-  metodo            varchar(50) not null,
+  nombre            varchar(50) not null,
   numero_tarjeta    varchar(16) not null,
-  fecha_vencimiento varchar(5)  not null,
   id_cliente        int         not null
 );
 
@@ -162,12 +161,15 @@ create table if not exists transaccion
   id_cliente        int           not null,
   id_descuento      int               null,
   id_tipo_boleta    int           not null,
+  id_metodo_pago    int           not null,
   constraint transaccion_cliente_id_cliente_fk
     foreign key (id_cliente) references cliente (id_cliente),
   constraint transaccion_descuento_id_descuento_fk
     foreign key (id_descuento) references descuento (id_descuento),
   constraint transaccion_tipo_boleta_id_tipo_boleta_fk
-    foreign key (id_tipo_boleta) references tipo_boleta (id_tipo_boleta)
+    foreign key (id_tipo_boleta) references tipo_boleta (id_tipo_boleta),
+  constraint transaccion_metodo_pago_id_metodo_pago_fk
+    foreign key (id_metodo_pago) references metodo_pago (id_metodo_pago)
 );
 
 create table if not exists viaje_programado

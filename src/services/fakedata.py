@@ -163,6 +163,17 @@ for _ in range(n_clients):
   with db.cursor() as cursor:
     cursor.callproc("sp_register_cliente", args)
 
+# payment methods: 1-2 per client
+for i in range(n_clients):
+  id_cliente = i + 1
+  payment_methods = fake.random_element([1, 2])
+  for _ in range(payment_methods):
+    nombre = f"Tarjeta {_ + 1}"
+    number = fake.numerify("4#####XXXXXX####")
+    args = [nombre, number, id_cliente, 0, 0, '']
+    with db.cursor() as cursor:
+      cursor.callproc("sp_register_metodo_pago", args)
+
 id_transaccion = 1
 # transactions: 1-4 per client
 for i in range(n_clients):
@@ -170,12 +181,21 @@ for i in range(n_clients):
   transactions = fake.random_element([1, 2, 3, 4])
 
   for _ in range(transactions):
+    # select payment method
+    payments = []
+    with db.cursor() as cursor:
+      cursor.execute(f"SELECT * FROM metodo_pago WHERE id_cliente = {id_cliente}")
+      payments = cursor.fetchall()
+
+    payment_selected = fake.random_element(payments)
+    id_metodo_pago = payment_selected['id_metodo_pago']
+
     # create transaction
     fecha_compra = fake.date_between(start_date='-10d', end_date='now')
     ruc = fake.random_number(digits=11, fix_len=True)
     correo_contacto = fake.email()
     telefono_contacto = fake.numerify("9########")
-    args = [0, 0, 0, fecha_compra, ruc, correo_contacto, telefono_contacto, id_cliente, None, 1, 0, 0, '']
+    args = [0, 0, 0, fecha_compra, ruc, correo_contacto, telefono_contacto, id_cliente, None, 1, id_metodo_pago, 0, 0, '']
     with db.cursor() as cursor:
       cursor.callproc("sp_register_transaccion", args)
     
@@ -245,6 +265,9 @@ for i in range(n_clients):
         """)
 
     id_transaccion += 1
+
+
+
 
 print("Base de datos rellenada con datos de ejemplo")
 
