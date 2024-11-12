@@ -29,4 +29,10 @@ pip install -r requirements.txt
 python src/app.py
 ```
 
+6. Load data to database.
+
+```bash
+python -m src.services.fakedata
+```
+
 ### If you want to see the docs [Click here](docs.md)

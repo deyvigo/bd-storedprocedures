@@ -2,6 +2,7 @@ CREATE PROCEDURE IF NOT EXISTS sp_register_chofer(
   IN  nombre            varchar(255),
   IN  apellido_pat      varchar(50),
   IN  apellido_mat      varchar(50),
+  IN  dni               varchar(8),
   IN  sexo              varchar(15),
   OUT last_id           int,
   OUT rows_affected     int,
@@ -17,8 +18,8 @@ BEGIN
   END;
 
   START TRANSACTION;
-  INSERT INTO chofer (nombre, apellido_pat, apellido_mat, sexo)
-  VALUES (nombre, apellido_pat, apellido_mat, sexo);
+  INSERT INTO chofer (nombre, apellido_pat, apellido_mat, dni, sexo)
+  VALUES (nombre, apellido_pat, apellido_mat, dni, sexo);
   SET rows_affected = ROW_COUNT();
   SET last_id = LAST_INSERT_ID();
   SET error_message = NULL;
@@ -42,6 +43,7 @@ CREATE PROCEDURE IF NOT EXISTS sp_update_chofer_by_id(
   IN  i_nombre         varchar(255),
   IN  i_apellido_pat   varchar(50),
   IN  i_apellido_mat   varchar(50),
+  IN  i_dni            varchar(8),
   IN  i_sexo           varchar(15),
   OUT rows_affected    int,
   OUT error_message    varchar(255)
@@ -56,7 +58,7 @@ BEGIN
 
   START TRANSACTION;
   UPDATE chofer
-  SET nombre = i_nombre, apellido_pat = i_apellido_pat, apellido_mat = i_apellido_mat, sexo = i_sexo
+  SET nombre = i_nombre, apellido_pat = i_apellido_pat, apellido_mat = i_apellido_mat, sexo = i_sexo, dni = i_dni
   WHERE id_chofer = i_id_chofer;
   SET rows_affected = ROW_COUNT();
   SET error_message = NULL;
