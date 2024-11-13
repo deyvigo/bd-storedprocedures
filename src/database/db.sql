@@ -59,6 +59,7 @@ create table if not exists metodo_pago
     primary key,
   nombre            varchar(50) not null,
   numero_tarjeta    varchar(16) not null,
+  estado            varchar(20) not null default 'activo',
   id_cliente        int         not null
 );
 

@@ -31,9 +31,33 @@ BEGIN
   SELECT * FROM metodo_pago WHERE id_metodo_pago = i_id_metodo_pago;
 END;
 
-CREATE PROCEDURE IF NOT EXISTS sp_get_metodo_pago_all()
+CREATE PROCEDURE IF NOT EXISTS sp_get_metodo_pago_all_active_by_id_client(
+  IN  i_id_cliente int
+)
 BEGIN
-  SELECT * FROM metodo_pago;
+  SELECT * FROM metodo_pago WHERE id_cliente = i_id_cliente AND estado = 'activo';
+END;
+
+CREATE PROCEDURE IF NOT EXISTS sp_delete_metodo_pago_by_id(
+  IN  i_id_metodo_pago int,
+  OUT rows_affected    int,
+  OUT error_message    varchar(255)
+)
+BEGIN
+  DECLARE EXIT HANDLER FOR SQLEXCEPTION
+  BEGIN
+    SET rows_affected = -1;
+    SET error_message = 'Error al intentar eliminar el método de pago';
+    ROLLBACK;
+  END;
+  
+  START TRANSACTION;
+  UPDATE metodo_pago
+  SET estado = 'inactivo'
+  WHERE id_metodo_pago = i_id_metodo_pago;
+  SET rows_affected = ROW_COUNT();
+  SET error_message = NULL;
+  COMMIT;
 END;
 
 CREATE PROCEDURE IF NOT EXISTS sp_update_metodo_pago_by_id(
@@ -54,8 +78,8 @@ BEGIN
   
   START TRANSACTION;
   UPDATE metodo_pago
-  SET nombre = i_nombre, numero_tarjeta = i_numero_tarjeta, fecha_vencimiento = i_fecha_vencimiento, id_cliente = i_id_cliente
-  WHERE id_metodo_pago = i_id_metodo_pago;
+  SET nombre = i_nombre, numero_tarjeta = i_numero_tarjeta
+  WHERE id_metodo_pago = i_id_metodo_pago AND id_cliente = i_id_cliente;
   SET rows_affected = ROW_COUNT();
   SET error_message = NULL;
   COMMIT;
