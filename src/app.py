@@ -12,7 +12,20 @@ app.config["JWT_SECRET_KEY"] = "bd-storedprocedures"  # Secreto para JWT
 jwt = JWTManager(app)
 CORS(app)
 
-swagger = Swagger(app)
+swagger = Swagger(app, template={
+  "info": {
+    "title": "tourXpress application",
+  },
+  "securityDefinitions": {
+    "BearerAuth": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header",
+      "description": "Introduce el token JWT para autenticar el cliente"
+    }
+  },
+  "security": [{"BearerAuth": []}]
+})
 
 db = Database()
 db.load_all_procedures()

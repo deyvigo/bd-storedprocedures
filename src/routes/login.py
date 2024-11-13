@@ -10,15 +10,20 @@ def login_admin():
   Login del admin para obtener un JWT
   ---
   parameters:
-    - name: body
-      in: body
+    - in: body
+      name: body
       required: true
-      description: Usuario del cliente
       schema:
         type: string
-        example:
-          username: "admin"
-          password: "12345678"
+        properties:
+          username:
+            type: string
+            example: "admin"
+            description: Usuario del cliente
+          password:
+            type: string
+            example: "12345678"
+            description: Contraseña del cliente
   responses:
     200:
       description: Login exitoso
@@ -38,15 +43,20 @@ def login_client():
   Login del cliente para obtener un JWT
   ---
   parameters:
-    - name: body
-      in: body
+    - in: body
+      name: body
       required: true
-      description: Usuario del cliente
       schema:
         type: string
-        example:
-          username: "username"
-          password: "12345678"
+        properties:
+          username:
+            type: string
+            example: "cliente1"
+            description: Usuario del cliente
+          password:
+            type: string
+            example: "12345678"
+            description: Contraseña del cliente
   responses:
     200:
       description: Login exitoso
