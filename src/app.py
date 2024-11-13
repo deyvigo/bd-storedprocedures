@@ -1,6 +1,7 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager, jwt_required
+from flasgger import Swagger
 
 from services.database import Database
 from routes import signup, login, client_router
@@ -10,6 +11,8 @@ app = Flask(__name__)
 app.config["JWT_SECRET_KEY"] = "bd-storedprocedures"  # Secreto para JWT
 jwt = JWTManager(app)
 CORS(app)
+
+swagger = Swagger(app)
 
 db = Database()
 db.load_all_procedures()
