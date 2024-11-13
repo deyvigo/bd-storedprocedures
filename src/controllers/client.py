@@ -98,3 +98,36 @@ class ClientController:
       return jsonify({ 'error': result['error_message'] }), 400
     
     return jsonify({ 'message': 'Método de pago registrado' }), 201
+  
+  @staticmethod
+  @jwt_required()
+  def update_client_payment_method(id_metodo_pago):
+    client = get_jwt_identity()
+    db = Database().connection()
+
+    try:
+      data = MetodoPagoCreateDTO(**request.json)
+    except ValidationError as ve:
+      return jsonify({'error': ve.errors() }), 400
+    
+    # replace values of 7-12 digits with *
+    numero = data.numero_tarjeta
+    data.numero_tarjeta = numero[:6] + 'X' * 6 + numero[-4:]
+    
+    print([id_metodo_pago, data.nombre, data.numero_tarjeta, client["id_cliente"], 0, ''])
+
+    try:
+      with db.cursor() as cursor:
+        cursor.callproc("sp_update_metodo_pago_by_id", [id_metodo_pago, data.nombre, data.numero_tarjeta, client["id_cliente"], 0, ''])
+        cursor.execute("SELECT @_sp_update_metodo_pago_4 AS rows_affected, @_sp_update_metodo_pago_5 AS error_message;")
+        result = cursor.fetchone()
+    except Exception as e:
+      return jsonify({'error': f'No se pudo actualizar el método de pago. {e}'}), 500
+    finally:
+      db.close()
+    print(result)
+
+    if result['error_message']:
+      return jsonify({ 'error': result['error_message'] }), 400
+    
+    return jsonify({ 'message': 'Método de pago actualizado' }), 200

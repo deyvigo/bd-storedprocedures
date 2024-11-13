@@ -93,7 +93,7 @@ def get_all_client_payment_methods():
   """
   return ClientController.get_all_client_payment_methods()
 
-@client_router.route('/client/payment-methods/<int:id_metodo_pago>', methods=['PUT'])
+@client_router.route('/client/payment-method/<int:id_metodo_pago>', methods=['PATCH'])
 def delete_client_payment_method(id_metodo_pago):
   """
   Eliminar un método de pago del cliente
@@ -148,3 +148,37 @@ def create_client_payment_method():
       description: Método de pago registrado
   """
   return ClientController.create_client_payment_method()
+
+@client_router.route('/client/payment-method/<int:id_metodo_pago>', methods=['PUT'])
+def update_client_payment_method(id_metodo_pago):
+  """
+  Actualizar un método de pago del cliente
+  ---
+  tags:
+    - Protegido
+  security:
+    - BearerAuth: []
+  parameters:
+    - in: path
+      name: id_metodo_pago
+      required: true
+      schema:
+        type: integer
+        example: 1
+    - in: body
+      name: body
+      required: true
+      schema:
+        type: object
+        properties:
+          nombre:
+            type: string
+            example: "Tarjeta 1"
+          numero_tarjeta:
+            type: string
+            example: "123456XXXXXX3456"
+  responses:
+    200:
+      description: Método de pago actualizado
+  """
+  return ClientController.update_client_payment_method(id_metodo_pago)

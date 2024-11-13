@@ -78,8 +78,8 @@ BEGIN
   
   START TRANSACTION;
   UPDATE metodo_pago
-  SET nombre = i_nombre, numero_tarjeta = i_numero_tarjeta, fecha_vencimiento = i_fecha_vencimiento, id_cliente = i_id_cliente
-  WHERE id_metodo_pago = i_id_metodo_pago;
+  SET nombre = i_nombre, numero_tarjeta = i_numero_tarjeta
+  WHERE id_metodo_pago = i_id_metodo_pago AND id_cliente = i_id_cliente;
   SET rows_affected = ROW_COUNT();
   SET error_message = NULL;
   COMMIT;
