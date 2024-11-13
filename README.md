@@ -35,4 +35,8 @@ python src/app.py
 python -m src.services.fakedata
 ```
 
-### If you want to see the docs [Click here](docs.md)
+### If you want to see the docs
+
+```
+/apidocs
+```
