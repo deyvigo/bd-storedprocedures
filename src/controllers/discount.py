@@ -85,7 +85,6 @@ class DiscountController:
         ])
         cursor.execute("SELECT @_sp_update_descuento_by_id_5 AS rows_affected, @_sp_update_descuento_by_id_6 AS error_message;")
         result = cursor.fetchone()
-        print(result)
         if not result:
           return {'error': 'No se obtuvieron resultados del procedimiento almacenado.'}, 500
 
