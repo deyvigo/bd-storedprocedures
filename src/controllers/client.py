@@ -23,11 +23,11 @@ class ClientController:
 
     if not response:
       return jsonify({ 'error': 'Usuario no encontrado' }), 404
-    
+
     del response['password']
 
     return jsonify(response), 200
-  
+
   @staticmethod
   @jwt_required()
   def get_all_client_payment_methods():
@@ -45,9 +45,9 @@ class ClientController:
 
     if not response:
       return jsonify({ 'error': 'No tienes métodos de pago' }), 404
-    
+
     return jsonify(response), 200
-  
+
   @staticmethod
   @jwt_required()
   def delete_client_payment_method(id_metodo_pago):
@@ -64,11 +64,11 @@ class ClientController:
     finally:
       db.close()
 
-    if result['error_message']:
+    if result and result['error_message']:
       return jsonify({ 'error': result['error_message'] }), 400
-    
-    return jsonify({ 'message': 'Método de pago eliminado' }), 200
-  
+
+    return jsonify({ 'message': 'Método de pago eliminado', 'id_metodo_pago': id_metodo_pago }), 200
+
   @staticmethod
   @jwt_required()
   def create_client_payment_method():
@@ -79,26 +79,31 @@ class ClientController:
       data = MetodoPagoCreateDTO(**request.json)
     except ValidationError as ve:
       return jsonify({'error': ve.errors() }), 400
-    
+
     # replace values of 7-12 digits with *
     numero = data.numero_tarjeta
-    data.numero_tarjeta = numero[:6] + 'X' * 6 + numero[-4:]
-    
+    data.numero_tarjeta = numero[:6] + '*' * 6 + numero[-4:]
+
     try:
       with db.cursor() as cursor:
         cursor.callproc("sp_register_metodo_pago", [data.nombre, data.numero_tarjeta, client["id_cliente"], 0, 0, ''])
-        cursor.execute("SELECT @_sp_register_metodo_pago_4 AS rows_affected, @_sp_register_metodo_pago_5 AS last_id, @_sp_register_metodo_pago_6 AS error_message;")
+        cursor.execute("SELECT @_sp_register_metodo_pago_4 AS rows_affected, @_sp_register_metodo_pago_3 AS last_id, @_sp_register_metodo_pago_5 AS error_message;")
         result = cursor.fetchone()
     except Exception as e:
       return jsonify({'error': f'No se pudo registrar el método de pago. {e}'}), 500
     finally:
       db.close()
 
-    if result['error_message']:
+    if result and result['error_message']:
       return jsonify({ 'error': result['error_message'] }), 400
-    
-    return jsonify({ 'message': 'Método de pago registrado' }), 201
-  
+
+    return jsonify({
+      'message': 'Método de pago creado exitosamente',
+      'id_metodo_pago': result['last_id'],
+      'nombre': data.nombre,
+      'numero_tarjeta': data.numero_tarjeta
+    }), 201
+
   @staticmethod
   @jwt_required()
   def update_client_payment_method(id_metodo_pago):
@@ -109,11 +114,11 @@ class ClientController:
       data = MetodoPagoCreateDTO(**request.json)
     except ValidationError as ve:
       return jsonify({'error': ve.errors() }), 400
-    
+
     # replace values of 7-12 digits with *
     numero = data.numero_tarjeta
-    data.numero_tarjeta = numero[:6] + 'X' * 6 + numero[-4:]
-    
+    data.numero_tarjeta = numero[:6] + '*' * 6 + numero[-4:]
+
     print([id_metodo_pago, data.nombre, data.numero_tarjeta, client["id_cliente"], 0, ''])
 
     try:
@@ -127,7 +132,12 @@ class ClientController:
       db.close()
     print(result)
 
-    if result['error_message']:
+    if result and result['error_message']:
       return jsonify({ 'error': result['error_message'] }), 400
-    
-    return jsonify({ 'message': 'Método de pago actualizado' }), 200
+
+    return jsonify({
+      'message': 'Método de pago actualizado exitosamente',
+      'id_metodo_pago': id_metodo_pago,
+      'nombre': data.nombre,
+      'numero_tarjeta': data.numero_tarjeta
+    }), 200
