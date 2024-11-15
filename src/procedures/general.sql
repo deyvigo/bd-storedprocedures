@@ -2,7 +2,7 @@ CREATE PROCEDURE IF NOT EXISTS sp_get_destinos_by_city(
     IN  i_departamento varchar(100)
 )
 BEGIN
-    SELECT DISTINCT t_destino.departamento AS Destinos 
+    SELECT DISTINCT t_destino.departamento AS ciudad_destino 
     FROM ruta r
     INNER JOIN terminal t_origen ON r.id_origen = t_origen.id_terminal
     INNER JOIN terminal t_destino ON r.id_destino = t_destino.id_terminal
@@ -16,6 +16,7 @@ CREATE PROCEDURE IF NOT EXISTS sp_get_scheduled_trip(
 )
 BEGIN
     SELECT 
+        vp.id_viaje_programado AS id_viaje_programado,
         t_origen.nombre AS origen, 
         t_destino.nombre AS destino, 
         tsb.servicio AS servicio, 
@@ -25,7 +26,7 @@ BEGIN
         r.duracion_estimada AS duracion, 
         vp.precio_nivel_uno AS precio_min, 
         (b.asientos-vp.asientos_ocupados) AS asientos_disponibles, 
-        r.duracion_estimada AS duracion, r.distancia AS distancia 
+        r.distancia AS distancia 
     FROM viaje_programado vp
     INNER JOIN BUS b ON vp.id_bus = b.id_bus
     INNER JOIN ruta r ON vp.id_ruta = r.id_ruta
