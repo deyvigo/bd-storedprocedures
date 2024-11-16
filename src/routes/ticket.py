@@ -44,3 +44,27 @@ def get_all_tickets():
 
   """
   return TicketController.get_all_tickets_by_id_client()
+
+@ticket_router.route('/ticket/pdf/<int:id_pasaje>', methods=['GET'])
+def get_pdf_ticket(id_pasaje):
+  """
+  Obtener el PDF del boleto
+  ---
+  tags:
+    - Protegido
+  security:
+    - BearerAuth: []
+  parameters:
+    - in: path
+      name: id_pasaje
+      required: true
+      schema:
+        type: integer
+        example: 1
+  responses:
+    200:
+      description: PDF del boleto
+    404:
+      description: No se ha encontrado el id seleccionado
+  """
+  return TicketController.get_pdf_ticket(id_pasaje)
