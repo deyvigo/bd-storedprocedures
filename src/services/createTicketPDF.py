@@ -83,7 +83,11 @@ def draw_ticket_pdf(ticket_data):
   draw.text((20, 1000), '2. Presentarse con su DNI o pasaporte físico.', fill=(0, 0, 0), font=font)
 
   # generate the path to the image file
+  directory = os.path.join(os.getcwd(), 'tickets')
   path = os.path.join(os.getcwd(), 'tickets/ticket.pdf')
+
+  if not os.path.exists(directory):
+    os.makedirs(directory)
 
   image = image.filter(ImageFilter.SMOOTH)
   image.save(path, 'PDF')
