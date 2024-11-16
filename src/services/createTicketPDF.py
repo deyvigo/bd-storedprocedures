@@ -1,6 +1,8 @@
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 import os
 
+from utils.hash_name import hash_name
+
 def draw_ticket_pdf(ticket_data):
   width, height = 800, 1600
   image = Image.new('RGB', (width, height), (255, 255, 255))
@@ -84,10 +86,16 @@ def draw_ticket_pdf(ticket_data):
 
   # generate the path to the image file
   directory = os.path.join(os.getcwd(), 'tickets')
-  path = os.path.join(os.getcwd(), 'tickets/ticket.pdf')
+
+  name = f'{ticket_data["pasajero"]}_{hash_name(ticket_data["dni"])}_{ticket_data["fecha_salida"].strftime('%d/%m/%Y')}_{str(ticket_data["hora_salida"])}_{ticket_data["id_pasaje"]}'
+  hashed_name = hash_name(name)
+
+  path = os.path.join(os.getcwd(), f'tickets/{hashed_name}.pdf')
 
   if not os.path.exists(directory):
     os.makedirs(directory)
 
   image = image.filter(ImageFilter.SMOOTH)
   image.save(path, 'PDF')
+
+  return hashed_name

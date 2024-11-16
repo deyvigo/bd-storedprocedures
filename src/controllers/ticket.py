@@ -1,5 +1,6 @@
-from flask import jsonify
+from flask import jsonify, send_file, abort
 from flask_jwt_extended import jwt_required, get_jwt_identity
+import os
 
 from services.database import Database
 from services.createTicketPDF import draw_ticket_pdf
@@ -30,7 +31,7 @@ class TicketController:
   
   @staticmethod
   @jwt_required()
-  def get_pdf_ticket(id_pasaje):
+  def create_pdf_ticket(id_pasaje):
     db = Database().connection()
 
     try:
@@ -42,8 +43,20 @@ class TicketController:
     finally:
       db.close()
 
-    print(response)
-    draw_ticket_pdf(response)
+    try:
+      ticket_name =draw_ticket_pdf(response)
+    except Exception as e:
+      return { 'error': f'No se pudo generar el PDF del boleto. {e}' }, 400
+    
+    return { 'message': 'PDF generado', 'ticket_name': ticket_name }, 200
+  
+  @staticmethod
+  def get_pdf_ticket(name):
+    try:
+      path = os.path.join(os.getcwd(), f'tickets/{name}.pdf')
+      if not os.path.exists(path):
+        abort(404, description='No se ha encontrado el recurso')
 
-    return { 'message': 'PDF generado' }, 200
-
+      return send_file(path)
+    except FileNotFoundError:
+      abort(404, description='No se ha encontrado el recurso')

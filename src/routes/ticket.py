@@ -45,10 +45,10 @@ def get_all_tickets():
   """
   return TicketController.get_all_tickets_by_id_client()
 
-@ticket_router.route('/ticket/pdf/<int:id_pasaje>', methods=['GET'])
-def get_pdf_ticket(id_pasaje):
+@ticket_router.route('/ticket/pdf/<int:id_pasaje>/generate', methods=['GET'])
+def create_pdf_ticket(id_pasaje):
   """
-  Obtener el PDF del boleto
+  Generar el PDF del boleto
   ---
   tags:
     - Protegido
@@ -67,4 +67,19 @@ def get_pdf_ticket(id_pasaje):
     404:
       description: No se ha encontrado el id seleccionado
   """
-  return TicketController.get_pdf_ticket(id_pasaje)
+  return TicketController.create_pdf_ticket(id_pasaje)
+
+@ticket_router.route('/ticket/pdf/<string:name>', methods=['GET'])
+def get_pdf_ticket(name):
+  """
+  Redirecciona al recurso PDF
+  ---
+  parameters:
+    - in: path
+      name: name
+      required: true
+      schema:
+        type: string
+        example: "hash"
+  """
+  return TicketController.get_pdf_ticket(name)
