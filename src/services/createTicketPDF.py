@@ -6,8 +6,13 @@ from utils.hash_name import hash_name
 def draw_ticket_pdf(ticket_data):
   width, height = 800, 1600
   image = Image.new('RGB', (width, height), (255, 255, 255))
-
   draw = ImageDraw.Draw(image)
+
+  path_logo = os.path.join(os.getcwd(), 'logo/logo.png')
+  logo = Image.open(path_logo)
+
+  # Posicionar el logo (centrado horizontalmente)
+  image.paste(logo, (400 - int(logo.width / 2), 100 - int(logo.height / 2)))
 
   path = os.path.join(os.getcwd(), 'font/SourGummy-Regular.ttf')
   font = ImageFont.truetype(path, 28)
@@ -41,7 +46,7 @@ def draw_ticket_pdf(ticket_data):
   draw.line((20, 520, width - 20, 520), fill=(0, 0, 0), width=2)
 
   draw.text((20, 540), 'Pasajero:', fill=(0, 0, 0), font=font)
-  draw.text((220, 540), ticket_data["pasajero"], fill=(0, 0, 0), font=font)
+  draw.text((160, 540), ticket_data["pasajero"], fill=(0, 0, 0), font=font)
   draw.text((20, 580), 'Tipo de documento:', fill=(0, 0, 0), font=font)
   draw.text((300, 580), 'DNI', fill=(0, 0, 0), font=font)
   draw.text((20, 620), 'Número de documento:', fill=(0, 0, 0), font=font)
