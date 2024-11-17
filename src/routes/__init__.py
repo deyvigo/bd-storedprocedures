@@ -4,3 +4,4 @@ from .client import client_router
 from .discount import discount_router
 from .service import service_router
 from .general import general_router
+from .admin import admin_router
