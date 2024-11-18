@@ -98,19 +98,43 @@ class Database:
     db = self.connection()
     try:
       with db.cursor() as cursor:
-        cursor.execute("""
-          CREATE TRIGGER IF NOT EXISTS update_occuped_seats
-          AFTER INSERT ON pasaje
-          FOR EACH ROW
-          BEGIN
-            UPDATE viaje_programado
-            SET asientos_ocupados = asientos_ocupados + 1
-            WHERE id_viaje_programado = NEW.id_viaje_programado;
-          END;
-        """)
-
+        dir_triggers_path = os.path.join(os.path.dirname(__file__), '..', 'triggers')
+        sql_files = [f for f in os.listdir(dir_triggers_path) if f.endswith('.sql')]
+        for f_sql in sql_files:
+          with open(os.path.join(dir_triggers_path, f_sql), 'r') as file:
+            sql = file.read()
+            if sql:
+              try:
+                cursor.execute(sql)
+              except Exception as e:
+                print(f'Error en el procedimiento {f_sql}: {e}')
+        db.commit()
+        print('Triggers creados')
     except Exception as e:
       print(f'Error durante la creación de los triggers: {e}')
       db.rollback()
     finally:
       db.close()
+      
+      
+  def delete_all_triggers(self):
+    db = self.connection()
+    try:
+      with db.cursor() as cursor:
+        sql = """
+          SELECT TRIGGER_NAME
+          FROM information_schema.TRIGGERS
+          WHERE TRIGGER_SCHEMA = %s;
+        """
+        db_name = os.getenv('DB_NAME')
+        cursor.execute(sql, (db_name,))
+        procs = cursor.fetchall()
+        if procs.__len__() > 0:
+          for proc in procs:
+            cursor.execute(f'DROP TRIGGER {proc['TRIGGER_NAME']};')
+          db.commit()
+          print('Triggers eliminados')
+        else:
+          print('No hay triggers para eliminar')
+    except Exception as e:
+      print(f'Error durante la eliminación de los triggers: {e}') 
