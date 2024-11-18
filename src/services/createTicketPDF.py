@@ -17,7 +17,7 @@ def draw_ticket_pdf(ticket_data):
   path = os.path.join(os.getcwd(), 'font/SourGummy-Regular.ttf')
   font = ImageFont.truetype(path, 28)
 
-  title = f"BOLETA {ticket_data["id_pasaje"]:016}"
+  title = f"BOLETA {ticket_data["id_transaccion"]:016}"
   
   # calculate the width of the text
   bbox = draw.textbbox((0,0), title, font=font)
