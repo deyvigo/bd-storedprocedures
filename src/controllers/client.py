@@ -66,9 +66,12 @@ class ClientController:
 
     if result and result['error_message']:
       return jsonify({ 'error': result['error_message'] }), 400
-
-    return jsonify({ 'message': 'Método de pago eliminado', 'id_metodo_pago': id_metodo_pago }), 200
-
+    
+    return jsonify({
+      'message': 'Método de pago eliminado',
+      'id_metodo_pago': id_metodo_pago
+    }), 200
+  
   @staticmethod
   @jwt_required()
   def create_client_payment_method():
@@ -83,7 +86,7 @@ class ClientController:
     # replace values of 7-12 digits with *
     numero = data.numero_tarjeta
     data.numero_tarjeta = numero[:6] + '*' * 6 + numero[-4:]
-
+    
     try:
       with db.cursor() as cursor:
         cursor.callproc("sp_register_metodo_pago", [data.nombre, data.numero_tarjeta, client["id_cliente"], 0, 0, ''])
@@ -96,14 +99,14 @@ class ClientController:
 
     if result and result['error_message']:
       return jsonify({ 'error': result['error_message'] }), 400
-
+    
     return jsonify({
-      'message': 'Método de pago creado exitosamente',
+      'message': 'Método de pago registrado',
       'id_metodo_pago': result['last_id'],
       'nombre': data.nombre,
       'numero_tarjeta': data.numero_tarjeta
     }), 201
-
+  
   @staticmethod
   @jwt_required()
   def update_client_payment_method(id_metodo_pago):
@@ -118,7 +121,7 @@ class ClientController:
     # replace values of 7-12 digits with *
     numero = data.numero_tarjeta
     data.numero_tarjeta = numero[:6] + '*' * 6 + numero[-4:]
-
+    
     print([id_metodo_pago, data.nombre, data.numero_tarjeta, client["id_cliente"], 0, ''])
 
     try:
@@ -134,9 +137,9 @@ class ClientController:
 
     if result and result['error_message']:
       return jsonify({ 'error': result['error_message'] }), 400
-
+    
     return jsonify({
-      'message': 'Método de pago actualizado exitosamente',
+      'message': 'Método de pago actualizado',
       'id_metodo_pago': id_metodo_pago,
       'nombre': data.nombre,
       'numero_tarjeta': data.numero_tarjeta

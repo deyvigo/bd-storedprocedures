@@ -2,7 +2,7 @@ CREATE PROCEDURE IF NOT EXISTS sp_register_transaccion(
   IN  i_precio_neto       decimal(8, 2),
   IN  i_igv               decimal(8, 2),
   IN  i_precio_total      decimal(8, 2),
-  IN  i_fecha_compra      timestamp,
+  IN  i_fecha_compra      datetime,
   IN  i_ruc               varchar(20),
   IN  i_correo_contacto   varchar(255),
   IN  i_telefono_contacto varchar(20),
@@ -76,4 +76,32 @@ BEGIN
   SET rows_affected = ROW_COUNT();
   SET error_message = NULL;
   COMMIT;
+END;
+
+CREATE PROCEDURE IF NOT EXISTS sp_get_transaccion_by_id_cliente(
+  IN  i_id_cliente int
+)
+BEGIN
+  SELECT tr.id_transaccion, tr.fecha_compra, tr.precio_total, COUNT(p.id_transaccion) AS cantidad_pasajes
+  FROM transaccion tr
+  JOIN pasaje p ON p.id_transaccion = tr.id_transaccion
+  WHERE tr.id_cliente = i_id_cliente
+  GROUP BY tr.id_transaccion
+  ORDER BY tr.fecha_compra ASC;
+END;
+
+CREATE PROCEDURE IF NOT EXISTS sp_get_transaccion_by_id(
+  IN  i_id_transaccion int
+)
+BEGIN
+  SELECT
+    tr.id_transaccion,
+    tr.fecha_compra,
+    tr.precio_total,
+    COUNT(p.id_pasaje) AS cantidad_pasajes,
+    tr.igv,
+    tr.ruc,
+    tr.precio_neto
+  FROM transaccion tr
+  WHERE tr.id_transaccion = i_id_transaccion;
 END;
