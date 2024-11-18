@@ -56,12 +56,12 @@ def load_triggers():
   return jsonify({ 'message': 'Triggers creados' }), 200
 
 @app.route('/delete-triggers', methods=['GET'])
-def load_triggers():
+def delete_triggers():
   Database().delete_all_triggers()
   return jsonify({ 'message': 'Triggers eliminados' }), 200
 
 @app.route('/reload-triggers', methods=['GET'])
-def load_triggers():
+def reload_triggers():
   Database().delete_all_triggers()
   Database().create_triggers()
   return jsonify({ 'message': 'Triggers cargados' }), 200
