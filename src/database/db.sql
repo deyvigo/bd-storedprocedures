@@ -22,7 +22,8 @@ create table if not exists chofer
   apellido_pat varchar(50)  not null,
   apellido_mat varchar(50)  not null,
   dni          varchar(8)   not null,
-  sexo         varchar(15)  not null
+  sexo         varchar(15)  not null,
+  estado       varchar(20)  not null
 );
 
 create table if not exists cliente
