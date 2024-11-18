@@ -4,7 +4,7 @@ from flask_jwt_extended import JWTManager, jwt_required
 from flasgger import Swagger
 
 from services.database import Database
-from routes import signup, login, client_router, ticket_router
+from routes import signup, login, client_router, ticket_router, transaccion_router
 
 app = Flask(__name__)
 
@@ -34,6 +34,7 @@ app.register_blueprint(signup)
 app.register_blueprint(login)
 app.register_blueprint(client_router)
 app.register_blueprint(ticket_router)
+app.register_blueprint(transaccion_router)
 
 @app.route('/helloworld/public', methods=['GET'])
 def helloworld():
