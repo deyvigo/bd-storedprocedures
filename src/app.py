@@ -55,5 +55,16 @@ def load_triggers():
   Database().create_triggers()
   return jsonify({ 'message': 'Triggers creados' }), 200
 
+@app.route('/delete-triggers', methods=['GET'])
+def load_triggers():
+  Database().delete_all_triggers()
+  return jsonify({ 'message': 'Triggers eliminados' }), 200
+
+@app.route('/reload-triggers', methods=['GET'])
+def load_triggers():
+  Database().delete_all_triggers()
+  Database().create_triggers()
+  return jsonify({ 'message': 'Triggers cargados' }), 200
+
 if __name__ == '__main__':
   app.run(debug=True)
