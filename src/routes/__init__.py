@@ -5,3 +5,5 @@ from .discount import discount_router
 from .service import service_router
 from .general import general_router
 from .admin import admin_router
+from .ticket import ticket_router
+from .transaccion import transaccion_router

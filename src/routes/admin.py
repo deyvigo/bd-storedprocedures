@@ -35,3 +35,12 @@ def create_admin_terminal():
         type: object
   """
   return AdminController.create_admin_terminal()
+
+#ruta para crear bus
+@admin_router.route('/admin/bus', methods=['POST'])
+def admin_create_bus():
+  """
+  
+  
+  """
+  return AdminController.admin_create_bus()
