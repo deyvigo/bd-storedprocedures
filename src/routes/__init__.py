@@ -6,3 +6,4 @@ from .service import service_router
 from .general import general_router
 from .ticket import ticket_router
 from .transaccion import transaccion_router
+from .terminal import terminal_router
