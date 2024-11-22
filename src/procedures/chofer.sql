@@ -39,11 +39,11 @@ CREATE PROCEDURE IF NOT EXISTS sp_add_chofer(
   IN  i_apellido_mat   varchar(50),
   IN  i_dni            varchar(8),
   IN  i_sexo           varchar(15),
-  IN  i_status         varchar(15),
+  IN  i_estado        varchar(15),
 )
 BEGIN
   INSERT INTO chofer (nombre, apellido_pat, apellido_mat, dni, sexo, estado)
-  VALUES (i_nombre, i_apellido_pat, i_apellido_mat, i_dni, i_sexo, i_status);
+  VALUES (i_nombre, i_apellido_pat, i_apellido_mat, i_dni, i_sexo, i_estado);
 END;
 
 
