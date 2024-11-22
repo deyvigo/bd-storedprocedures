@@ -25,13 +25,25 @@ BEGIN
     SET last_id = 0;
     ROLLBACK;
   ELSE
-    INSERT INTO chofer (nombre, apellido_pat, apellido_mat, dni, sexo, estado)
-    VALUES (i_nombre, i_apellido_pat, i_apellido_mat, i_dni, i_sexo, 'contratado');
+    sp_add_chofer(0, i_nombre, i_apellido_pat, i_apellido_mat, i_dni, i_sexo, 'contratado');
     SET rows_affected = ROW_COUNT();
     SET last_id = LAST_INSERT_ID();
     SET error_message = NULL;
     COMMIT;
   END IF;  
+END;
+
+CREATE PROCEDURE IF NOT EXISTS sp_add_chofer(
+  IN  i_nombre         varchar(255),
+  IN  i_apellido_pat   varchar(50),
+  IN  i_apellido_mat   varchar(50),
+  IN  i_dni            varchar(8),
+  IN  i_sexo           varchar(15),
+  IN  i_status         varchar(15),
+)
+BEGIN
+  INSERT INTO chofer (nombre, apellido_pat, apellido_mat, dni, sexo, estado)
+  VALUES (i_nombre, i_apellido_pat, i_apellido_mat, i_dni, i_sexo, i_status);
 END;
 
 
