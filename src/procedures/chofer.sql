@@ -125,11 +125,11 @@ CREATE PROCEDURE IF NOT EXISTS sp_get_free_chofer(
   IN  i_date date
 )
 BEGIN
-  SELECT chofer.id_chofer 
+  SELECT chofer.*
   FROM chofer
-  LEFT JOIN viajes_programados 
-    ON chofer.id_chofer = viajes_programados.id_chofer 
-    AND viajes_programados.fecha_viaje BETWEEN i_date AND DATE_ADD(i_date, INTERVAL 1 DAY)
+  LEFT JOIN viaje_programado 
+    ON chofer.id_chofer = viaje_programado.id_chofer 
+    AND viaje_programado.fecha_salida BETWEEN i_date AND DATE_ADD(i_date, INTERVAL 1 DAY)
   WHERE chofer.estado = 'contratado'
-    AND viajes_programados.id_chofer IS NULL;
+    AND viaje_programado.id_chofer IS NULL;
 END;
