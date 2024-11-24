@@ -25,13 +25,25 @@ BEGIN
     SET last_id = 0;
     ROLLBACK;
   ELSE
-    INSERT INTO chofer (nombre, apellido_pat, apellido_mat, dni, sexo, estado)
-    VALUES (i_nombre, i_apellido_pat, i_apellido_mat, i_dni, i_sexo, 'contratado');
+    CALL sp_add_chofer(i_nombre, i_apellido_pat, i_apellido_mat, i_dni, i_sexo, 'contratado');
     SET rows_affected = ROW_COUNT();
     SET last_id = LAST_INSERT_ID();
     SET error_message = NULL;
     COMMIT;
   END IF;  
+END;
+
+CREATE PROCEDURE IF NOT EXISTS sp_add_chofer(
+  IN  i_nombre         varchar(255),
+  IN  i_apellido_pat   varchar(50),
+  IN  i_apellido_mat   varchar(50),
+  IN  i_dni            varchar(8),
+  IN  i_sexo           varchar(15),
+  IN  i_estado        varchar(15)
+)
+BEGIN
+  INSERT INTO chofer(nombre, apellido_pat, apellido_mat, dni, sexo, estado)
+  VALUES (i_nombre, i_apellido_pat, i_apellido_mat, i_dni, i_sexo, i_estado);
 END;
 
 
@@ -107,4 +119,17 @@ BEGIN
   SET rows_affected = ROW_COUNT();
   SET error_message = NULL;
   COMMIT;
+END;
+
+CREATE PROCEDURE IF NOT EXISTS sp_get_free_chofer(
+  IN  i_date date
+)
+BEGIN
+  SELECT chofer.*
+  FROM chofer
+  LEFT JOIN viaje_programado 
+    ON chofer.id_chofer = viaje_programado.id_chofer 
+    AND viaje_programado.fecha_salida BETWEEN i_date AND DATE_ADD(i_date, INTERVAL 1 DAY)
+  WHERE chofer.estado = 'contratado'
+    AND viaje_programado.id_chofer IS NULL;
 END;

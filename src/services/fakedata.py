@@ -100,9 +100,10 @@ for _ in range(n_drivers):
   apellido_mat = fake.last_name()
   dni = fake.ean(length=8)
   sexo = fake.random_element(['masculino', 'femenino'])
+  estado = fake.random_element(['contratado', 'despedido'])
   args = [nombre, apellido_pat, apellido_mat, dni, sexo, 0, 0, '']
   with db.cursor() as cursor:
-    cursor.callproc("sp_register_chofer", args)
+    cursor.callproc("sp_add_chofer", args)
 
 # trips: 1-4 per route
 for i in range(4):
