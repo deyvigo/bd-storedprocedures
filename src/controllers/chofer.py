@@ -15,15 +15,16 @@ class ChoferController:
             data = request.json
             with db.cursor() as cursor:
                 cursor.callproc('sp_register_chofer', [data['nombre'], data['apellido_pat'], data['apellido_mat'], data['dni'], data['sexo'],0,0,""])
-                cursor.execute("SELECT @_sp_register_chofer_6 AS last_id, @_sp_register_chofer_7 AS rows_affected, @_sp_register_chofer_8 AS error_message;")
+                cursor.execute("SELECT @_sp_register_chofer_5 AS last_id, @_sp_register_chofer_6 AS rows_affected, @_sp_register_chofer_7 AS error_message;")
                 result = cursor.fetchone()
+                print(result)
                 rows_affected = result['rows_affected']
                 last_id = result['last_id']
                 error_message = result['error_message']
                 
                 if error_message:
                     return jsonify({ 'error': error_message }), 400
-
+                print(error_message)
                 return jsonify({
                 'message': 'Chofer registrado exitosamente',
                 'rows_affected': rows_affected,
