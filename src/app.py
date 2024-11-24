@@ -4,7 +4,7 @@ from flask_jwt_extended import JWTManager, jwt_required
 from flasgger import Swagger
 
 from services.database import Database
-from routes import signup, login, client_router, discount_router, service_router, chofer_router
+from routes import signup, login, client_router, ticket_router, transaccion_router, discount_router, service_router,general_router,chofer_router
 
 app = Flask(__name__)
 
@@ -33,9 +33,12 @@ db.load_all_procedures()
 app.register_blueprint(signup)
 app.register_blueprint(login)
 app.register_blueprint(client_router)
+app.register_blueprint(ticket_router)
+app.register_blueprint(transaccion_router)
 app.register_blueprint(discount_router)
 app.register_blueprint(service_router)
 app.register_blueprint(chofer_router)
+app.register_blueprint(general_router)
 
 @app.route('/helloworld/public', methods=['GET'])
 def helloworld():
@@ -55,6 +58,11 @@ def clear_procedures():
 def load_triggers():
   Database().create_triggers()
   return jsonify({ 'message': 'Triggers creados' }), 200
+@app.route('/reload-procedures', methods=['GET'])
+def reload_procedures():
+  Database().delete_all_procedures()
+  Database().load_all_procedures()
+  return jsonify({ 'message': 'Procedimientos actualizados' }), 200
 
 @app.route('/delete-triggers', methods=['GET'])
 def delete_triggers():

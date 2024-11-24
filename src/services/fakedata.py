@@ -170,7 +170,7 @@ for i in range(n_clients):
   payment_methods = fake.random_element([1, 2])
   for _ in range(payment_methods):
     nombre = f"Tarjeta {_ + 1}"
-    number = fake.numerify("4#####XXXXXX####")
+    number = fake.numerify("4#####******####")
     args = [nombre, number, id_cliente, 0, 0, '']
     with db.cursor() as cursor:
       cursor.callproc("sp_register_metodo_pago", args)
@@ -192,7 +192,7 @@ for i in range(n_clients):
     id_metodo_pago = payment_selected['id_metodo_pago']
 
     # create transaction
-    fecha_compra = fake.date_between(start_date='-10d', end_date='now')
+    fecha_compra = fake.date_time_between(start_date='-10d', end_date='now')
     ruc = fake.random_number(digits=11, fix_len=True)
     correo_contacto = fake.email()
     telefono_contacto = fake.numerify("9########")
