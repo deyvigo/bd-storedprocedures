@@ -60,3 +60,15 @@ BEGIN
   SET error_message = NULL;
   COMMIT;
 END;
+
+CREATE PROCEDURE IF NOT EXISTS sp_get_departamento_terminal()
+BEGIN 
+  SELECT 
+    ROW_NUMBER() OVER () AS id,
+    departamento
+  FROM (
+    SELECT departamento
+    FROM terminal
+    GROUP BY departamento
+  ) AS subquery;
+END;
