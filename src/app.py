@@ -4,8 +4,7 @@ from flask_jwt_extended import JWTManager, jwt_required
 from flasgger import Swagger
 
 from services.database import Database
-from routes import signup, login, client_router, ticket_router, transaccion_router, discount_router, service_router,general_router,admin_router
-from routes import signup, login, client_router, ticket_router, transaccion_router, discount_router, service_router,general_router,chofer_router
+from routes import signup, login, client_router, ticket_router, transaccion_router, discount_router, service_router,general_router,admin_router,chofer_router
 
 app = Flask(__name__)
 
