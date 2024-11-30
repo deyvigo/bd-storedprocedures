@@ -3,7 +3,7 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager, jwt_required
 
 from services.database import Database
-from routes import signup, login
+from routes import signup, login, general_router
 
 app = Flask(__name__)
 
@@ -16,6 +16,7 @@ db.load_all_procedures()
 
 app.register_blueprint(signup)
 app.register_blueprint(login)
+app.register_blueprint(general_router)
 
 @app.route('/helloworld/public', methods=['GET'])
 def helloworld():
@@ -30,6 +31,13 @@ def helloworld_private():
 def clear_procedures():
   Database().delete_all_procedures()
   return jsonify({ 'message': 'Procedimientos eliminados' }), 200
+
+
+@app.route('/reload-procedures', methods=['GET'])
+def reload_procedures():
+  Database().delete_all_procedures()
+  Database().load_all_procedures()
+  return jsonify({ 'message': 'Procedimientos cargados' }), 200
 
 if __name__ == '__main__':
   app.run(debug=True)

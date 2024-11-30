@@ -16,4 +16,4 @@ class ControllerGeneral:
         response = cursor.fetchall()
         return jsonify(response), 200
     except Exception as e:
-      return jsonify({ 'error': 'La base de datos no ha obtenido los datos necesarios' }), 400
+      return jsonify({ 'error': f'La base de datos no ha obtenido los datos necesarios {e}' }), 400
