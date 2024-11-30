@@ -9,6 +9,14 @@ BEGIN
     WHERE t_origen.departamento = i_departamento;
 END;
 
+CREATE PROCEDURE IF NOT EXISTS sp_get_origens_available(
+)
+BEGIN
+    SELECT DISTINCT t_origen.departamento AS ciudad_origen 
+    FROM ruta r
+    INNER JOIN terminal t_origen ON r.id_origen = t_origen.id_terminal;
+END;
+
 CREATE PROCEDURE IF NOT EXISTS sp_get_scheduled_trip(
     IN  i_origen varchar(100),
     IN  i_destino varchar(100),
