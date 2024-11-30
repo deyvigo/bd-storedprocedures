@@ -2,6 +2,8 @@ from flask import request, jsonify
 from flask_jwt_extended import jwt_required
 
 from services.database import Database
+import datetime
+import decimal
 
 class ControllerGeneral:
   
@@ -71,7 +73,29 @@ class ControllerGeneral:
       return jsonify({'error': f'No se pudo obtener la información de los viajes programados en la ruta {request.json['ciudad_origen']} a {request.json['ciudad_destino']} en fecha {request.json['fecha']}. {e}'}), 500
     finally:
       db.close()
+    print(response)
+    for row in response:
+      if isinstance(row['fecha_salida'], datetime.date):
+          row['fecha_salida'] = row['fecha_salida'].strftime('%Y-%m-%d')  
+      
+      if isinstance(row['duracion'], datetime.timedelta):
+          row['duracion'] = str(row['duracion']) 
+      
+      if isinstance(row['hora_llegada'], int):
+          hours = row['hora_llegada'] // 3600
+          minutes = (row['hora_llegada'] % 3600) // 60
+          seconds = row['hora_llegada'] % 60
+          row['hora_llegada'] = f'{hours:02}:{minutes:02}:{seconds:02}'
 
+      if isinstance(row['hora_salida'], datetime.timedelta):
+          total_seconds = row['hora_salida'].total_seconds()
+          hours = total_seconds // 3600
+          minutes = (total_seconds % 3600) // 60
+          seconds = total_seconds % 60
+          row['hora_salida'] = f'{int(hours):02}:{int(minutes):02}:{int(seconds):02}'
+
+      if isinstance(row['precio_min'], decimal.Decimal):
+          row['precio_min'] = float(row['precio_min'])  
     if not response:
       return jsonify({ 'error': 'Viajes programados no encontrados' }), 404
       

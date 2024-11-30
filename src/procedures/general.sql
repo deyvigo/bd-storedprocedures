@@ -30,7 +30,10 @@ BEGIN
         tsb.servicio AS servicio, 
         vp.fecha_salida AS fecha_salida, 
         vp.hora_salida AS hora_salida, 
-        (vp.hora_salida+r.duracion_estimada) AS hora_llegada,
+        DATE_FORMAT(TIME(FROM_UNIXTIME(UNIX_TIMESTAMP(CONCAT(vp.fecha_salida, ' ', vp.hora_salida)) + 
+            (HOUR(r.duracion_estimada) * 3600) + 
+            (MINUTE(r.duracion_estimada) * 60) + 
+            SECOND(r.duracion_estimada))), '%H:%i:%s') AS hora_llegada,
         r.duracion_estimada AS duracion, 
         vp.precio_nivel_uno AS precio_min, 
         (b.asientos-vp.asientos_ocupados) AS asientos_disponibles, 
