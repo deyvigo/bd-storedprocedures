@@ -7,7 +7,7 @@ class ControllerGeneral:
   
   @staticmethod
   @jwt_required()
-  def get_originis_available():
+  def get_origins_available():
     db = Database().connection()
     try:
       with db.cursor() as cursor:
