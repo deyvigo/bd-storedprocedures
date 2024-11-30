@@ -3,7 +3,7 @@ from flask_jwt_extended import jwt_required , get_jwt_identity
 from pydantic import ValidationError
 from services.database import Database
 from dto.adminCreateDTO import TerminalCreateDTO
-class TerminalController:
+class TerminalCreateController:
   @staticmethod
   @jwt_required()
   def get_admin_all_terminal():

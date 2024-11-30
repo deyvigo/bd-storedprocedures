@@ -1,9 +1,9 @@
 from flask import Blueprint
-from controllers.terminal import TerminalController
+from controllers.terminalCreate import TerminalCreateController
 
-terminal_router = Blueprint('terminal', __name__)
+terminalCreate_router = Blueprint('terminal', __name__)
 
-@terminal_router.route('/admin/terminal', methods=['POST'])
+@terminalCreate_router.route('/admin/terminal', methods=['POST'])
 def admin_create_terminal():
   """
   Crear una terminal
@@ -32,9 +32,9 @@ def admin_create_terminal():
     201:
       description: Terminal creada exitosamente
   """
-  return TerminalController.admin_create_terminal()
+  return TerminalCreateController.admin_create_terminal()
 
-@terminal_router.route('/admin/terminal', methods=['GET'])
+@terminalCreate_router.route('/admin/terminal', methods=['GET'])
 def get_admin_all_terminal():
   """
   Obtener todos los buses
@@ -49,9 +49,9 @@ def get_admin_all_terminal():
     404:
       description: No tienes terminales
   """
-  return TerminalController.get_admin_all_terminal()
+  return TerminalCreateController.get_admin_all_terminal()
 
-@terminal_router.route('/admin/terminal/<int:id_terminal>', methods=['PUT'])
+@terminalCreate_router.route('/admin/terminal/<int:id_terminal>', methods=['PUT'])
 def update_terminal(id_terminal):
   """
   Actualizar un terminal
@@ -86,4 +86,4 @@ def update_terminal(id_terminal):
             
         """
   
-  return TerminalController.update_terminal(id_terminal)
+  return TerminalCreateController.update_terminal(id_terminal)
