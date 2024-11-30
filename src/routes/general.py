@@ -163,8 +163,8 @@ def get_scheduled_trip():
                 format: time
                 example: "11:00:00"
               duracion:
-                type: integer
-                example: 60
+                type: time
+                example: "12:00:00"
               precio_min:
                 type: float
                 example: 120.00
