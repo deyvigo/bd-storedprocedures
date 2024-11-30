@@ -9,7 +9,7 @@ BEGIN
     WHERE t_origen.departamento = i_departamento;
 END;
 
-CREATE PROCEDURE IF NOT EXISTS sp_get_origens_available(
+CREATE PROCEDURE IF NOT EXISTS sp_get_origins_available(
 )
 BEGIN
     SELECT DISTINCT t_origen.departamento AS ciudad_origen 

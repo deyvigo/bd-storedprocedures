@@ -4,6 +4,25 @@ from flask_jwt_extended import jwt_required
 from services.database import Database
 
 class ControllerGeneral:
+  
+  @staticmethod
+  @jwt_required()
+  def get_originis_available():
+    db = Database().connection()
+    try:
+      with db.cursor() as cursor:
+        cursor.callproc('sp_get_origins_available', [])
+        response = cursor.fetchall()
+    except Exception as e:
+      return jsonify({'error': f'No se pudo obtener la información de las ciudades. {e}'}), 500
+    finally:
+      db.close()
+      
+    if not response:
+      return jsonify({ 'error': 'Ciudades no encontradas' }), 404
+    
+    return jsonify(response), 200
+  
   @staticmethod
   @jwt_required()
   def get_destination_by_city():
