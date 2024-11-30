@@ -5,6 +5,9 @@ from .discount import discount_router
 from .service import service_router
 from .chofer import chofer_router
 from .general import general_router
-from .admin import admin_router
 from .ticket import ticket_router
 from .transaccion import transaccion_router
+from .bus import bus_router
+from .terminal import terminal_router
+from .ruta import ruta_router
+from .asiento import asiento_router
