@@ -57,7 +57,7 @@ def get_destination_by_city():
                 type: string
                 example: "Ica"
     """
-  return ControllerGeneral.get_destination_by_city()
+  return ControllerGeneral.get_destinations_available()
 
 @general_router.route('/general/seat', methods=['POST'])
 def get_seat_by_trip():
@@ -102,7 +102,7 @@ def get_seat_by_trip():
               type: float
               example: 100.00
   """
-  return ControllerGeneral.get_seat_by_trip()
+  return ControllerGeneral.get_seats_by_trip()
 
 @general_router.route('/general/scheduled-trip', methods=['POST'])
 def get_scheduled_trip():
@@ -163,8 +163,8 @@ def get_scheduled_trip():
                 format: time
                 example: "11:00:00"
               duracion:
-                type: integer
-                example: 60
+                type: time
+                example: "12:00:00"
               precio_min:
                 type: float
                 example: 120.00

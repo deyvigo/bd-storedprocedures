@@ -1,38 +1,42 @@
--- Procedimiento para obtener destinos por ciudad
-CREATE OR REPLACE PROCEDURE sp_get_destinos_by_city(
-    i_departamento VARCHAR
-)
-LANGUAGE plpgsql
-AS $$
+-- Vista para obtener los orígenes disponibles
+CREATE OR REPLACE VIEW vw_get_origins_available AS
+SELECT DISTINCT t_origen.departamento AS ciudad_origen
+FROM ruta r
+INNER JOIN terminal t_origen ON r.id_origen = t_origen.id_terminal;
+
+CREATE OR REPLACE FUNCTION fn_get_destinos_by_city(i_departamento VARCHAR)
+RETURNS TABLE(ciudad_destino VARCHAR) AS $$
 BEGIN
+    RETURN QUERY
     SELECT DISTINCT t_destino.departamento AS ciudad_destino
     FROM ruta r
     INNER JOIN terminal t_origen ON r.id_origen = t_origen.id_terminal
     INNER JOIN terminal t_destino ON r.id_destino = t_destino.id_terminal
     WHERE t_origen.departamento = i_departamento;
 END;
-$$;
+$$ LANGUAGE plpgsql;
 
--- Procedimiento para obtener los orígenes disponibles
-CREATE OR REPLACE PROCEDURE sp_get_origins_available()
-LANGUAGE plpgsql
-AS $$
-BEGIN
-    SELECT DISTINCT t_origen.departamento AS ciudad_origen
-    FROM ruta r
-    INNER JOIN terminal t_origen ON r.id_origen = t_origen.id_terminal;
-END;
-$$;
-
--- Procedimiento para obtener viajes programados
-CREATE OR REPLACE PROCEDURE sp_get_scheduled_trip(
+-- Función para obtener viajes programados
+CREATE OR REPLACE FUNCTION fn_get_scheduled_trip(
     i_origen VARCHAR,
     i_destino VARCHAR,
     i_fecha DATE
 )
-LANGUAGE plpgsql
-AS $$
+RETURNS TABLE(
+    id_viaje_programado INT,
+    origen VARCHAR,
+    destino VARCHAR,
+    servicio VARCHAR,
+    fecha_salida DATE,
+    hora_salida TIME,
+    hora_llegada TIME,
+    duracion TIME,
+    precio_min NUMERIC,
+    asientos_disponibles INT,
+    distancia DOUBLE PRECISION
+) AS $$
 BEGIN
+    RETURN QUERY
     SELECT 
         vp.id_viaje_programado AS id_viaje_programado,
         t_origen.nombre AS origen, 
@@ -40,7 +44,7 @@ BEGIN
         tsb.servicio AS servicio, 
         vp.fecha_salida AS fecha_salida, 
         vp.hora_salida AS hora_salida, 
-        (vp.hora_salida + r.duracion_estimada * INTERVAL '1 minute') AS hora_llegada,
+        (('1970-01-01'::DATE + vp.hora_salida) + (r.duracion_estimada::TEXT || ' minutes')::INTERVAL)::TIME AS hora_llegada,
         r.duracion_estimada AS duracion, 
         vp.precio_nivel_uno AS precio_min, 
         (b.asientos - vp.asientos_ocupados) AS asientos_disponibles, 
@@ -56,15 +60,22 @@ BEGIN
     AND vp.fecha_salida = i_fecha
     AND (b.asientos - vp.asientos_ocupados) > 0;
 END;
-$$;
+$$ LANGUAGE plpgsql;
+
 
 -- Procedimiento para obtener asientos por viaje programado
-CREATE OR REPLACE PROCEDURE sp_get_seat_by_trip(
+CREATE OR REPLACE FUNCTION fn_get_seat_by_trip(
     i_id_viaje_programado INT
 )
-LANGUAGE plpgsql
-AS $$
+RETURNS TABLE(
+    id_asiento INT,
+    nivel INT,
+    numero INT,
+    precio NUMERIC(8, 2),
+    estado VARCHAR
+) AS $$
 BEGIN
+    RETURN QUERY
     SELECT 
         a.id_asiento,
         a.nivel,
@@ -74,17 +85,19 @@ BEGIN
             ELSE vp.precio_nivel_dos
         END AS precio,
         CASE
-            WHEN p.id_pasaje IS NULL THEN 'Disponible'
-            ELSE 'Ocupado'
+            WHEN p.id_pasaje IS NULL THEN 'Disponible'::VARCHAR
+            ELSE 'Ocupado'::VARCHAR
         END AS estado
     FROM asiento a
-    LEFT JOIN pasaje p ON a.id_asiento = p.id_asiento 
+    LEFT JOIN pasaje p 
+        ON a.id_asiento = p.id_asiento 
         AND p.id_viaje_programado = i_id_viaje_programado
-    INNER JOIN viaje_programado vp ON vp.id_viaje_programado = i_id_viaje_programado
+    INNER JOIN viaje_programado vp 
+        ON vp.id_viaje_programado = i_id_viaje_programado
     WHERE a.id_bus = (
         SELECT id_bus
         FROM viaje_programado 
         WHERE id_viaje_programado = i_id_viaje_programado
     );
 END;
-$$;
+$$ LANGUAGE plpgsql;
