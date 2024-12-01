@@ -19,7 +19,8 @@ CREATE TABLE IF NOT EXISTS chofer
   nombre       varchar(255) NOT NULL,
   apellido_pat varchar(50)  NOT NULL,
   apellido_mat varchar(50)  NOT NULL,
-  sexo         varchar(15)  NOT NULL
+  sexo         varchar(15)  NOT NULL,
+  dni          varchar(8)   NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS cliente
@@ -51,10 +52,9 @@ CREATE TABLE IF NOT EXISTS descuento
 CREATE TABLE IF NOT EXISTS metodo_pago
 (
   id_metodo_pago    serial PRIMARY KEY,
-  metodo            varchar(50) NOT NULL,
+  nombre            varchar(50) NOT NULL,
   numero_tarjeta    varchar(16) NOT NULL,
-  cvv               varchar(3)  NOT NULL,
-  fecha_vencimiento varchar(5)  NOT NULL,
+  estado            varchar(20) NOT NULL DEFAULT 'activo',
   id_cliente        int         NOT NULL
 );
 
@@ -146,14 +146,17 @@ CREATE TABLE IF NOT EXISTS transaccion
   correo_contacto   varchar(255)  NOT NULL,
   telefono_contacto varchar(20)   NOT NULL,
   id_cliente        int           NOT NULL,
-  id_descuento      int           NOT NULL,
+  id_descuento      int           NULL,
   id_tipo_boleta    int           NOT NULL,
+  id_metodo_pago    int           NOT NULL,
   CONSTRAINT transaccion_cliente_id_cliente_fk
     FOREIGN KEY (id_cliente) REFERENCES cliente (id_cliente),
   CONSTRAINT transaccion_descuento_id_descuento_fk
     FOREIGN KEY (id_descuento) REFERENCES descuento (id_descuento),
   CONSTRAINT transaccion_tipo_boleta_id_tipo_boleta_fk
-    FOREIGN KEY (id_tipo_boleta) REFERENCES tipo_boleta (id_tipo_boleta)
+    FOREIGN KEY (id_tipo_boleta) REFERENCES tipo_boleta (id_tipo_boleta),
+  CONSTRAINT transaccion_metodo_pago_id_metodo_pago_fk
+    FOREIGN KEY (id_metodo_pago) REFERENCES metodo_pago (id_metodo_pago)
 );
 
 CREATE TABLE IF NOT EXISTS viaje_programado
