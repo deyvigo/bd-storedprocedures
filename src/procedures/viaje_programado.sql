@@ -28,7 +28,7 @@ EXCEPTION
     
   WHEN OTHERS THEN
     rows_affected := 0;
-    error_message := 'Error al registrar el viaje de programado';
+    error_message := 'Error al registrar el viaje de programado' || SQLERRM;
     last_id := NULL;
 END;
 $$ LANGUAGE plpgsql;

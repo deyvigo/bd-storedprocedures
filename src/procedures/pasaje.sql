@@ -119,3 +119,41 @@ EXCEPTION
     error_message := 'Error desconocido en pasaje table' || SQLERRM;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION fn_get_pasaje_by_id_cliente(
+  i_id_cliente INT
+)
+RETURNS TABLE(
+  id_pasaje           INT,
+  precio_total        DECIMAL(8, 2),
+  fecha_salida        TIMESTAMP,
+  puerto_salida       VARCHAR,
+  puerto_destino      VARCHAR,
+  nombre_pasajero     VARCHAR,
+  hora_salida         TIME,
+  fecha_compra        TIMESTAMP
+)
+AS $$
+BEGIN
+  RETURN QUERY
+  SELECT
+    p.id_pasaje,
+    p.precio_total as precio,
+    vp.fecha_salida,
+    te_origen.nombre as puerto_salida,
+    te_destino.nombre as puerto_destino,
+    CONCAT(pa.nombre, ', ', pa.apellido_pat, ' ', pa.apellido_mat) as nombre_pasajero,
+    vp.hora_salida,
+    t.fecha_compra
+  FROM pasaje p
+  JOIN viaje_programado vp ON vp.id_viaje_programado = p.id_viaje_programado
+  JOIN ruta r ON r.id_ruta = vp.id_ruta
+  JOIN terminal te_origen ON te_origen.id_terminal = r.id_origen
+  JOIN terminal te_destino ON te_destino.id_terminal = r.id_destino
+  JOIN pasajero pa ON pa.id_pasajero = p.id_pasajero
+  JOIN transaccion t ON t.id_transaccion = p.id_transaccion
+  JOIN cliente c ON c.id_cliente =  t.id_cliente
+  WHERE c.id_cliente = i_id_cliente
+  ORDER BY t.fecha_compra ASC;
+END;
+$$ LANGUAGE plpgsql;

@@ -3,13 +3,14 @@ CREATE OR REPLACE PROCEDURE sp_register_chofer(
   apellido_pat      VARCHAR,
   apellido_mat      VARCHAR,
   sexo              VARCHAR,
+  dni               VARCHAR,
   OUT last_id       INT,
   OUT rows_affected INT,
   OUT error_message VARCHAR
 ) AS $$
 BEGIN
-  INSERT INTO chofer (nombre, apellido_pat, apellido_mat, sexo)
-  VALUES (nombre, apellido_pat, apellido_mat, sexo)
+  INSERT INTO chofer (nombre, apellido_pat, apellido_mat, sexo, dni)
+  VALUES (nombre, apellido_pat, apellido_mat, sexo, dni)
   RETURNING id_chofer INTO last_id;
 
   GET DIAGNOSTICS rows_affected = ROW_COUNT;
@@ -23,7 +24,7 @@ EXCEPTION
     
   WHEN OTHERS THEN
     rows_affected := 0;
-    error_message := 'Error al registrar el chofer';
+    error_message := 'Error al registrar el chofer ' || SQLERRM;
     last_id := NULL;
 END;
 $$ LANGUAGE plpgsql;
