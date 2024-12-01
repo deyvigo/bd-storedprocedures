@@ -131,7 +131,6 @@ for i in range(4):
     with db.cursor() as cursor:
       cursor.execute("CALL sp_register_viaje_programado(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);", args)
       results = cursor.fetchone()
-      print(results)
       db.commit()
 
 # pasengers
