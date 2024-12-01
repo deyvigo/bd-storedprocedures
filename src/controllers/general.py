@@ -8,7 +8,6 @@ import decimal
 class ControllerGeneral:
   
   @staticmethod
-  @jwt_required()
   def get_origins_available():
     db = Database().connection()
     try:
@@ -26,7 +25,6 @@ class ControllerGeneral:
     return jsonify(response), 200
   
   @staticmethod
-  @jwt_required()
   def get_destination_by_city():
     db = Database().connection()
     try:
@@ -62,7 +60,6 @@ class ControllerGeneral:
     return jsonify(response), 200
     
   @staticmethod
-  @jwt_required()
   def get_scheduled_trip():
     db = Database().connection()
     try:
