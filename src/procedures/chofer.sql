@@ -141,41 +141,15 @@ BEGIN
 END;
 $$;
 
-CREATE OR REPLACE FUNCTION sp_get_hired_chofer()
-RETURNS TABLE (
-    id_chofer INT,
-    nombre VARCHAR,
-    apellido_pat VARCHAR,
-    apellido_mat VARCHAR,
-    dni VARCHAR,
-    sexo VARCHAR,
-    estado VARCHAR
-)
-LANGUAGE plpgsql
-AS $$
-BEGIN
-    RETURN QUERY
-    SELECT * FROM chofer WHERE estado = 'contratado';
-END;
-$$;
+CREATE OR REPLACE VIEW vw_hired_chofer AS
+SELECT * 
+FROM chofer 
+WHERE estado = 'contratado';
 
-CREATE OR REPLACE FUNCTION sp_get_fired_chofer()
-RETURNS TABLE (
-    id_chofer INT,
-    nombre VARCHAR,
-    apellido_pat VARCHAR,
-    apellido_mat VARCHAR,
-    dni VARCHAR,
-    sexo VARCHAR,
-    estado VARCHAR
-)
-LANGUAGE plpgsql
-AS $$
-BEGIN
-    RETURN QUERY
-    SELECT * FROM chofer WHERE estado = 'despedido';
-END;
-$$;
+CREATE OR REPLACE VIEW vw_fired_chofer AS
+SELECT * 
+FROM chofer 
+WHERE estado = 'despedido';
 
 CREATE OR REPLACE PROCEDURE sp_update_chofer_by_id(
     i_id_chofer INT,
