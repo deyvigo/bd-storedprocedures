@@ -5,7 +5,7 @@ from flasgger import Swagger
 
 from services.database import Database
 
-from routes import signup, login, client_router, ticket_router, transaccion_router, discount_router, service_router, general_router, terminal_router, chofer_router, bus_router, terminalCreate_router, ruta_router, asiento_router, pasajero_router
+from routes import signup, login, client_router, ticket_router, transaccion_router, discount_router, service_router, general_router, terminal_router, chofer_router, bus_router, terminalCreate_router, ruta_router, asiento_router, pasajero_router, tipo_boleta_router
 
 app = Flask(__name__)
 
@@ -47,6 +47,7 @@ app.register_blueprint(ruta_router)
 app.register_blueprint(asiento_router)
 app.register_blueprint(terminal_router)
 app.register_blueprint(pasajero_router)
+app.register_blueprint(tipo_boleta_router)
 
 @app.route('/helloworld/public', methods=['GET'])
 def helloworld():
