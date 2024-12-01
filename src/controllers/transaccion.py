@@ -1,6 +1,7 @@
-from flask import jsonify, abort, send_file
+from flask import jsonify, abort, send_file, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 import os
+import json
 from psycopg2.extras import RealDictCursor
 
 from services.database import Database
@@ -56,3 +57,34 @@ class TransaccionController:
       return send_file(path)
     except FileNotFoundError:
       abort(404, description='No se ha encontrado el recurso')
+
+  @staticmethod
+  @jwt_required()
+  def post_new_transaction_with_tickets():
+    db = Database().connection()
+    try:
+      data = request.json
+      precio_neto = data['precio_neto']
+      igv = data['igv']
+      precio_total = data['precio_total']
+      fecha_compra = data['fecha_compra']
+      ruc = data['ruc']
+      correo_contacto = data['correo_contacto']
+      telefono_contacto = data['telefono_contacto']
+      id_cliente = data['id_cliente']
+      id_descuento = data['id_descuento']
+      id_tipo_boleta = data['id_tipo_boleta']
+      id_metodo_pago = data['id_metodo_pago']
+      pasajes =json.dumps(data['pasajes'])
+      args = [precio_neto, igv, precio_total, fecha_compra, ruc, correo_contacto, telefono_contacto, id_cliente, id_descuento, id_tipo_boleta, id_metodo_pago, pasajes,""]
+      with db.cursor(cursor_factory=RealDictCursor) as cursor:
+        data = request.json
+        cursor.execute('CALL sp_register_transaction_with_tickets(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)', (precio_neto, igv, precio_total, fecha_compra, ruc, correo_contacto, telefono_contacto, id_cliente, id_descuento, id_tipo_boleta, id_metodo_pago, pasajes,""))
+        db.commit()
+        response = cursor.fetchone()
+        error_message = response['error_message']
+    except Exception as e:
+      return { 'error': f'No se pudo registrar la transaccion. {e}' }, 400
+    if error_message:
+      return jsonify({ 'error': error_message }), 400
+    return jsonify({"message":"Transaccion realizada con exito"}), 200

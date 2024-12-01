@@ -74,3 +74,83 @@ def get_pdf_transaction(name):
         example: "hash"
   """
   return TransaccionController.get_pdf_transaction(name)
+
+@transaccion_router.route('/transaction/new', methods=['POST'])
+def post_new_transaction_with_tickets():
+  """
+  Generar una nueva transaccion con tickets
+  ---
+  tags:
+    - Protegido
+  security:
+    - BearerAuth: []
+  parameters:
+    - in: body
+      name: body
+      required: true
+      schema:
+        type: object
+        properties:
+          precio_neto:
+            type: float
+            example: 100.00
+          igv:
+            type: float
+            example: 18.00
+          precio_total:
+            type: float
+            example: 118.00
+          fecha_compra:
+            type: string
+            example: "2000-01-01 10:00:00"
+          ruc:
+            type: string
+            example: "1234567890"
+          correo_contacto:
+            type: string
+            example: "correo@correo.com"
+          telefono_contacto:
+            type: string
+            example: "123456789"
+          id_cliente:
+            type: integer
+            example: 1
+          id_descuento:
+            type: integer
+            example: 1
+          id_tipo_boleta:
+            type: integer
+            example: 1
+          id_metodo_pago:
+            type: integer
+            example: 1
+          pasajes:
+            type: array
+            items:
+              type: object
+              properties:
+                precio_neto:
+                  type: float
+                  example: 100.00
+                igv:
+                  type: float
+                  example: 18.00
+                precio_total:
+                  type: float
+                  example: 118.00
+                id_pasajero:
+                  type: integer
+                  example: 1
+                id_asiento:
+                  type: integer
+                  example: 1
+                id_viaje_programado:
+                  type: integer
+                  example: 1
+  responses:
+    200:
+      description: Transaccion creada
+    400:
+      description: Error al crear la transaccion
+  """
+  return TransaccionController.post_new_transaction_with_tickets() 

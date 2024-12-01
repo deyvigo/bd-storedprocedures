@@ -212,3 +212,82 @@ BEGIN
     mp.numero_tarjeta;
 END;
 $$ LANGUAGE plpgsql;
+CREATE OR REPLACE PROCEDURE sp_register_transaction_with_tickets(
+  IN i_precio_neto DECIMAL(8, 2),
+  IN i_igv DECIMAL(8, 2),
+  IN i_precio_total DECIMAL(8, 2),
+  IN i_fecha_compra TIMESTAMP,
+  IN i_ruc VARCHAR(20),
+  IN i_correo_contacto VARCHAR(255),
+  IN i_telefono_contacto VARCHAR(20),
+  IN i_id_cliente INT,
+  IN i_id_descuento INT,
+  IN i_id_tipo_boleta INT,
+  IN i_id_metodo_pago INT,
+  IN pasajes_data JSONB,
+  OUT error_message VARCHAR(255)
+)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  last_transaccion_id INT;
+  rows_affected INT DEFAULT 0;
+  last_pasaje_id INT;
+  pasaje_rows_affected INT DEFAULT 0;
+  index INT := 0;
+  total_pasajes INT;
+  pasaje_data JSONB;
+BEGIN
+  -- Registrar transacción
+  CALL sp_register_transaccion(
+    i_precio_neto, i_igv, i_precio_total, i_fecha_compra,
+    i_ruc, i_correo_contacto, i_telefono_contacto, i_id_cliente,
+    i_id_descuento, i_id_tipo_boleta, i_id_metodo_pago,
+    last_transaccion_id, rows_affected, error_message
+  );
+
+  -- Verificar si la transacción fue exitosa
+  IF rows_affected <= 0 THEN
+    RAISE EXCEPTION 'Error al registrar la transacción: %', error_message;
+  END IF;
+
+  -- Registrar pasajes
+  total_pasajes := jsonb_array_length(pasajes_data);
+
+  WHILE index < total_pasajes LOOP
+    pasaje_data := pasajes_data -> index;
+
+    CALL sp_register_pasaje(
+      i_fecha_compra,
+      (pasaje_data ->> 'precio_neto')::DECIMAL,
+      (pasaje_data ->> 'igv')::DECIMAL,
+      (pasaje_data ->> 'precio_total')::DECIMAL,
+      (pasaje_data ->> 'id_pasajero')::INT,
+      (pasaje_data ->> 'id_asiento')::INT,
+      (pasaje_data ->> 'id_viaje_programado')::INT,
+      last_transaccion_id,
+      NULL, -- Fecha de modificación
+      NULL, -- ID admin mod
+      last_pasaje_id,
+      pasaje_rows_affected,
+      error_message
+    );
+
+    -- Validar pasaje
+    IF pasaje_rows_affected <= 0 THEN
+      RAISE EXCEPTION 'Error al registrar el pasaje: %', error_message;
+    END IF;
+
+    index := index + 1;
+  END LOOP;
+
+  -- No hubo errores
+  error_message := NULL;
+
+EXCEPTION
+  WHEN OTHERS THEN
+    -- Capturar error de SQL
+    error_message := 'Error: ' || SQLSTATE || ' - ' || SQLERRM;
+    RAISE; -- Propagar el error hacia el contexto superior
+END;
+$$;
