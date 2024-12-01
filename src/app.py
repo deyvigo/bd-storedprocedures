@@ -3,7 +3,7 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager, jwt_required
 
 from services.database import Database
-from routes import signup, login, general_router
+from routes import signup, login, general_router, ticket_router
 
 app = Flask(__name__)
 
@@ -17,6 +17,7 @@ db.load_all_procedures()
 app.register_blueprint(signup)
 app.register_blueprint(login)
 app.register_blueprint(general_router)
+app.register_blueprint(ticket_router)
 
 @app.route('/helloworld/public', methods=['GET'])
 def helloworld():
