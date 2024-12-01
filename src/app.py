@@ -3,8 +3,7 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager, jwt_required
 from flasgger import Swagger
 
-from services.database import Database
-from routes import signup, login, client_router, ticket_router, transaccion_router, discount_router, service_router, general_router, terminal_router, chofer_router,bus_router,terminalCreate_router,ruta_router,asiento_router
+from routes import signup, login, client_router, ticket_router, transaccion_router, discount_router, service_router, general_router, terminal_router, chofer_router, bus_router, terminalCreate_router, ruta_router, asiento_router, pasajero_router
 
 app = Flask(__name__)
 
@@ -29,6 +28,7 @@ swagger = Swagger(app, template={
 
 db = Database()
 db.load_all_procedures()
+db.create_database()
 
 app.register_blueprint(signup)
 app.register_blueprint(login)
@@ -44,6 +44,7 @@ app.register_blueprint(terminalCreate_router)
 app.register_blueprint(ruta_router)
 app.register_blueprint(asiento_router)
 app.register_blueprint(terminal_router)
+app.register_blueprint(pasajero_router)
 
 @app.route('/helloworld/public', methods=['GET'])
 def helloworld():
