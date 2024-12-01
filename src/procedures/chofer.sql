@@ -9,8 +9,8 @@ CREATE OR REPLACE PROCEDURE sp_register_chofer(
   OUT error_message VARCHAR
 ) AS $$
 BEGIN
-  INSERT INTO chofer (nombre, apellido_pat, apellido_mat, sexo, dni)
-  VALUES (nombre, apellido_pat, apellido_mat, sexo, dni)
+  INSERT INTO chofer (nombre, apellido_pat, apellido_mat, sexo, dni,estado)
+  VALUES (nombre, apellido_pat, apellido_mat, sexo, dni, 'contratado')
   RETURNING id_chofer INTO last_id;
 
   GET DIAGNOSTICS rows_affected = ROW_COUNT;
@@ -80,6 +80,12 @@ BEGIN
   GET DIAGNOSTICS rows_affected = ROW_COUNT;
   error_message := NULL;
 
+  IF rows_affected = 0 THEN
+    error_message := 'No se actualizó ningún chofer con ese ID';
+  ELSE
+    error_message := NULL;
+  END IF;
+
 EXCEPTION
   WHEN unique_violation THEN
     rows_affected := 0;
@@ -116,8 +122,9 @@ BEGIN
           error_message := 'Error al intentar actualizar el chofer';
   END;
 END;
+$$;
 
-CREATE OR REPLACE FUNCTION sp_get_free_chofer(i_date DATE)
+CREATE OR REPLACE FUNCTION fn_get_free_chofer(i_date DATE)
 RETURNS TABLE (
     id_chofer INT,
     nombre VARCHAR,
@@ -126,20 +133,21 @@ RETURNS TABLE (
     dni VARCHAR,
     sexo VARCHAR,
     estado VARCHAR
-)
-LANGUAGE plpgsql
-AS $$
+) AS $$
 BEGIN
     RETURN QUERY
-    SELECT chofer.*
+    SELECT chofer.id_chofer, chofer.nombre, chofer.apellido_pat, chofer.apellido_mat, chofer.dni, chofer.sexo, chofer.estado
     FROM chofer
     LEFT JOIN viaje_programado 
-    ON chofer.id_chofer = viaje_programado.id_chofer 
-    AND viaje_programado.fecha_salida BETWEEN i_date AND i_date + INTERVAL '1 day'
+        ON chofer.id_chofer = viaje_programado.id_chofer 
+        AND viaje_programado.fecha_salida BETWEEN i_date - INTERVAL '1 day' AND i_date + INTERVAL '1 day'
     WHERE chofer.estado = 'contratado'
-    AND viaje_programado.id_chofer IS NULL;
+    AND (viaje_programado.id_chofer IS NULL);
 END;
-$$;
+$$ LANGUAGE plpgsql;
+
+
+
 
 CREATE OR REPLACE VIEW vw_hired_chofer AS
 SELECT * 
@@ -150,36 +158,3 @@ CREATE OR REPLACE VIEW vw_fired_chofer AS
 SELECT * 
 FROM chofer 
 WHERE estado = 'despedido';
-
-CREATE OR REPLACE PROCEDURE sp_update_chofer_by_id(
-    i_id_chofer INT,
-    i_nombre VARCHAR(255),
-    i_apellido_pat VARCHAR(50),
-    i_apellido_mat VARCHAR(50),
-    i_dni VARCHAR(8),
-    i_sexo VARCHAR(15),
-    OUT rows_affected INT,
-    OUT error_message VARCHAR
-)
-LANGUAGE plpgsql
-AS $$
-BEGIN
-    BEGIN
-        UPDATE chofer
-        SET 
-            nombre = i_nombre,
-            apellido_pat = i_apellido_pat,
-            apellido_mat = i_apellido_mat,
-            dni = i_dni,
-            sexo = i_sexo
-        WHERE id_chofer = i_id_chofer;
-
-        rows_affected := FOUND::INT; 
-        error_message := NULL;
-    EXCEPTION
-        WHEN OTHERS THEN
-            rows_affected := -1;
-            error_message := 'Error al intentar actualizar el chofer';
-    END;
-END;
-$$;
