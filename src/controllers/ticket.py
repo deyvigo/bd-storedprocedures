@@ -25,6 +25,7 @@ class TicketController:
     if not response:
       return { 'error': 'No tienes boletos' }, 404
     
+    print(response)
     for r in response:
       r['hora_salida'] = str(r['hora_salida'])
     

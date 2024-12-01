@@ -31,8 +31,8 @@ class TransaccionController:
     db = Database().connection()
 
     try:
-      with db.cursor() as cursor:
-        cursor.callproc('sp_get_transaccion_by_id_for_pdf', [id_transaccion])
+      with db.cursor(cursor_factory=RealDictCursor) as cursor:
+        cursor.callproc('fn_get_transaccion_by_id_for_pdf', [id_transaccion])
         response = cursor.fetchone()
     except Exception as e:
       return { 'error': f'No se pudo obtener la transaccion del id seleccionado. {e}' }, 400
