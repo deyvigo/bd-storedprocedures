@@ -9,3 +9,7 @@ from .ticket import ticket_router
 from .transaccion import transaccion_router
 from .terminal import terminal_router
 from .pasajero import pasajero_router
+from .bus import bus_router
+from .terminalCreate import terminalCreate_router
+from .ruta import ruta_router
+from .asiento import asiento_router

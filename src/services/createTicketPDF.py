@@ -1,4 +1,5 @@
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
+import qrcode
 import os
 
 from utils.hash_name import hash_name
@@ -56,38 +57,69 @@ def draw_ticket_pdf(ticket_data):
 
   left_margin = 600
 
-  draw.text((20, 700), 'Precio Neto:', fill=(0, 0, 0), font=font)
+  current_y = 700
+
+  draw.text((20, current_y), 'Precio Neto:', fill=(0, 0, 0), font=font)
   bbox = draw.textbbox((0,0), str(ticket_data["precio_neto"]), font=font)
   text_width = bbox[2] - bbox[0]
-  draw.text((left_margin - text_width, 700), str(ticket_data["precio_neto"]), fill=(0, 0, 0), font=font)
+  draw.text((left_margin - text_width, current_y), str(ticket_data["precio_neto"]), fill=(0, 0, 0), font=font)
 
-  draw.text((20, 740), 'IGV:', fill=(0, 0, 0), font=font)
+  current_y += 40
+  draw.text((20, current_y), 'IGV:', fill=(0, 0, 0), font=font)
   bbox = draw.textbbox((0,0), str(ticket_data["igv"]), font=font)
   text_width = bbox[2] - bbox[0]
-  draw.text((left_margin - text_width, 740), str(ticket_data["igv"]), fill=(0, 0, 0), font=font)
+  draw.text((left_margin - text_width, current_y), str(ticket_data["igv"]), fill=(0, 0, 0), font=font)
 
-  draw.text((20, 780), 'Precio Total:', fill=(0, 0, 0), font=font)
+  current_y += 40
+  draw.text((20, current_y), 'Precio Total:', fill=(0, 0, 0), font=font)
   bbox = draw.textbbox((0,0), str(ticket_data["precio_total"]), font=font)
   text_width = bbox[2] - bbox[0]
-  draw.text((left_margin - text_width, 780), str(ticket_data["precio_total"]), fill=(0, 0, 0), font=font)
+  draw.text((left_margin - text_width, current_y), str(ticket_data["precio_total"]), fill=(0, 0, 0), font=font)
 
-  draw.text((20, 820), 'Número de tarjeta:', fill=(0, 0, 0), font=font)
+  current_y += 40
+  draw.text((20, current_y), 'Número de tarjeta:', fill=(0, 0, 0), font=font)
   bbox = draw.textbbox((0,0), ticket_data["numero_tarjeta"], font=font)
   text_width = bbox[2] - bbox[0]
-  draw.text((left_margin - text_width, 820), ticket_data["numero_tarjeta"], fill=(0, 0, 0), font=font)
+  draw.text((left_margin - text_width, current_y), ticket_data["numero_tarjeta"], fill=(0, 0, 0), font=font)
 
-  draw.line((20, 880, width - 20, 880), fill=(0, 0, 0), width=2)
+  current_y += 60
+  draw.line((20, current_y, width - 20, current_y), fill=(0, 0, 0), width=2)
+
+  # QR code
+  qr_data = f'{ticket_data["pasajero"]}_{ticket_data["dni"]}'
+  qr = qrcode.QRCode(
+    version=1, 
+    error_correction=qrcode.constants.ERROR_CORRECT_L, 
+    box_size=10, 
+    border=1
+  )
+  qr.add_data(qr_data)
+  qr.make(fit=True)
+
+  # Crear la imagen del QR
+  qr_img = qr.make_image(fill="black", back_color="white")
+  qr_width = 400
+
+  current_y += 20
+
+  qr_resized = qr_img.resize((qr_width, qr_width))
+  image.paste(qr_resized, ((width - qr_width) // 2, current_y))
 
   font = ImageFont.truetype(path, 40)
 
+  current_y += qr_width + 20
   bbox = draw.textbbox((0,0), 'Recomendaciones', font=font)
   text_width = bbox[2] - bbox[0]
 
-  draw.text(((width - text_width) / 2, 900), 'Recomendaciones', fill=(0, 0, 0), font=font)
+  draw.text(((width - text_width) / 2, current_y), 'Recomendaciones', fill=(0, 0, 0), font=font)
 
   font = ImageFont.truetype(path, 28)
-  draw.text((20, 960), '1. Llegar 30 minutos al terminal de embarque.', fill=(0, 0, 0), font=font)
-  draw.text((20, 1000), '2. Presentarse con su DNI o pasaporte físico.', fill=(0, 0, 0), font=font)
+  
+  current_y += 60
+  draw.text((20, current_y), '1. Llegar 30 minutos al terminal de embarque.', fill=(0, 0, 0), font=font)
+
+  current_y += 40
+  draw.text((20, current_y), '2. Presentarse con su DNI o pasaporte físico.', fill=(0, 0, 0), font=font)
 
   # generate the path to the image file
   directory = os.path.join(os.getcwd(), 'tickets')
