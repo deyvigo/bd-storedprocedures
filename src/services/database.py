@@ -86,7 +86,7 @@ class Database:
         procs = cursor.fetchall()
         if procs.__len__() > 0:
           for proc in procs:
-            cursor.execute(f'DROP PROCEDURE {proc['ROUTINE_NAME']};')
+            cursor.execute(f"DROP PROCEDURE {proc['ROUTINE_NAME']};")
           db.commit()
           print('Procedimientos eliminados')
         else:
@@ -131,7 +131,7 @@ class Database:
         procs = cursor.fetchall()
         if procs.__len__() > 0:
           for proc in procs:
-            cursor.execute(f'DROP TRIGGER {proc['TRIGGER_NAME']};')
+            cursor.execute(f"DROP TRIGGER {proc['TRIGGER_NAME']};")
           db.commit()
           print('Triggers eliminados')
         else:
