@@ -124,3 +124,28 @@ EXCEPTION
     error_message := 'Error desconocido en transaccion table' || SQLERRM;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION fn_get_transaccion_by_id_cliente(
+  i_id_cliente INT
+)
+RETURNS TABLE(
+  id_transaccion    INT,
+  fecha_compra      TIMESTAMP,
+  precio_total      DECIMAL(8, 2),
+  cantidad_pasajes  INT
+)
+AS $$
+BEGIN
+  RETURN QUERY
+  SELECT
+    tr.id_transaccion,
+    tr.fecha_compra::TIMESTAMP AS fecha_compra,
+    tr.precio_total,
+    COUNT(p.id_transaccion)::INT AS cantidad_pasajes
+  FROM transaccion tr
+  JOIN pasaje p ON p.id_transaccion = tr.id_transaccion
+  WHERE tr.id_cliente = i_id_cliente
+  GROUP BY tr.id_transaccion
+  ORDER BY tr.fecha_compra ASC;
+END;
+$$ LANGUAGE plpgsql;
