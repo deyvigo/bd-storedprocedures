@@ -73,7 +73,7 @@ create table if not exists pasajero
   apellido_pat     varchar(50)  not null,
   apellido_mat     varchar(50)  not null,
   fecha_nacimiento date         not null,
-  sexo             varchar(15)  not null CHECK (sexo IN ('masculino', 'femenino')),
+  sexo             varchar(15)  not null CHECK (sexo IN ('masculino', 'femenino'))
 );
 
 create table if not exists terminal
