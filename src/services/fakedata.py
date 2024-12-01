@@ -12,7 +12,7 @@ fake = Faker("es_ES")
 db = Database().connection()
 
 # admin
-n_admins = 1
+n_admins = 5
 for _ in range(n_admins):
   nombre = fake.first_name()
   apellido_pat = fake.last_name()
@@ -101,7 +101,7 @@ for _ in range(n_drivers):
   dni = fake.ean(length=8)
   sexo = fake.random_element(['masculino', 'femenino'])
   estado = fake.random_element(['contratado', 'despedido'])
-  args = [nombre, apellido_pat, apellido_mat, dni, sexo, 0, 0, '']
+  args = [nombre, apellido_pat, apellido_mat, dni, sexo, estado]
   with db.cursor() as cursor:
     cursor.callproc("sp_add_chofer", args)
 
@@ -138,7 +138,8 @@ for _ in range(n_pasajeros):
 
 # type of billets
 with db.cursor() as cursor:
-  cursor.callproc("sp_register_tipo_boleta", ["normal", 0, 0, ''])
+  cursor.callproc("sp_register_tipo_boleta", ["boleta", 0, 0, ''])
+  cursor.callproc("sp_register_tipo_boleta", ["factura", 0, 0, ''])
 
 # trips, buses and seats to be used in the simulation
 trips = {}
@@ -195,8 +196,9 @@ for i in range(n_clients):
     fecha_compra = fake.date_time_between(start_date='-10d', end_date='now')
     ruc = fake.random_number(digits=11, fix_len=True)
     correo_contacto = fake.email()
+    tipo_boleta = fake.random_element([1, 2])
     telefono_contacto = fake.numerify("9########")
-    args = [0, 0, 0, fecha_compra, ruc, correo_contacto, telefono_contacto, id_cliente, None, 1, id_metodo_pago, 0, 0, '']
+    args = [100, 18,118, fecha_compra, ruc, correo_contacto, telefono_contacto, id_cliente, None, tipo_boleta, id_metodo_pago, 0, 0, '']
     with db.cursor() as cursor:
       cursor.callproc("sp_register_transaccion", args)
     
@@ -245,8 +247,8 @@ for i in range(n_clients):
       elif nivel == 2:
         precio_total = viaje_programado['precio_nivel_dos']
       
-      igv = precio_total * Decimal('0.18')
-      precio_neto = precio_total - igv
+      precio_neto = precio_total / Decimal('1.18')
+      igv = precio_total - precio_neto
 
       detail_args = [fecha_compra, precio_neto, igv, precio_total, id_pasajero, seat['id_asiento'], id_viaje_programado, id_transaccion, None, None, 0, 0, '']
       with db.cursor() as cursor:

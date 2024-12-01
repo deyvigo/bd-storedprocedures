@@ -123,7 +123,7 @@ BEGIN
 END;
 
 
-CREATE PROCEDURE sp_register_transaction_with_tickets(
+CREATE PROCEDURE IF NOT EXISTS sp_register_transaction_with_tickets(
   IN i_precio_neto DECIMAL(8, 2),
   IN i_igv DECIMAL(8, 2),
   IN i_precio_total DECIMAL(8, 2),
@@ -173,6 +173,9 @@ BEGIN
     END IF;
 
     -- Registrar pasajes
+    SET @precio_total_transaccion = 0.00;
+    SET @precio_neto_transaccion = 0.00;
+    SET @igv_transaccion = 0.00;
     SET @index = 0;
     SET @total_pasajes = JSON_LENGTH(pasajes_data);
 

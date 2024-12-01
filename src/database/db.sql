@@ -73,7 +73,7 @@ create table if not exists pasajero
   apellido_pat     varchar(50)  not null,
   apellido_mat     varchar(50)  not null,
   fecha_nacimiento date         not null,
-  sexo             varchar(15)  not null CHECK (sexo IN ('masculino', 'femenino')),
+  sexo             varchar(15)  not null CHECK (sexo IN ('masculino', 'femenino'))
 );
 
 create table if not exists terminal
@@ -130,7 +130,7 @@ create table if not exists bus
   id_bus               int auto_increment
     primary key,
   asientos             int         not null check (asientos > 0),
-  placa                varchar(7)  not null UNIQUE CHECK (LENGTH(placa) = 7),
+  placa                varchar(6)  not null UNIQUE CHECK (LENGTH(placa) = 6),
   marca                varchar(50) not null ,
   niveles              int         not null CHECK (niveles IN (1, 2)),
   id_tipo_servicio_bus int         not null,
@@ -161,7 +161,7 @@ create table if not exists transaccion
   correo_contacto   varchar(255)  not null,
   telefono_contacto varchar(20)   not null,
   id_cliente        int           not null,
-  id_descuento      int           UNIQUE,
+  id_descuento      int           ,
   id_tipo_boleta    int           not null,
   id_metodo_pago    int           not null,
   constraint transaccion_cliente_id_cliente_fk
