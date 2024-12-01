@@ -1,5 +1,7 @@
 from flask import jsonify, request
-from flask_jwt_extended import get_jwt_identity, jwt_required
+
+from flask_jwt_extended import jwt_required
+
 from dto.serviceDTO import ServiceDTO
 from services.database import Database
 

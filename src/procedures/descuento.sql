@@ -62,3 +62,12 @@ BEGIN
   SET error_message = NULL;
   COMMIT;
 END;
+
+CREATE PROCEDURE IF NOT EXISTS sp_get_descuento_by_codigo(
+  IN  i_codigo varchar(30)
+)
+BEGIN
+  SELECT id_descuento
+  FROM descuento
+  WHERE codigo = i_codigo;
+END;

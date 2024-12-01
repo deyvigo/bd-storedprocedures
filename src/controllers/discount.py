@@ -97,3 +97,21 @@ class DiscountController:
       db.close()
 
     return { 'message': 'Descuento actualizado' }, 200
+
+  @staticmethod
+  def get_descuento_by_codigo(codigo):
+    db = Database().connection()
+
+    try:
+      with db.cursor() as cursor:
+        cursor.callproc('sp_get_descuento_by_codigo', [codigo])
+        response = cursor.fetchone()
+    except Exception as e:
+      return { 'error': f'No se pudo obtener el descuento. {e}' }, 400
+    finally:
+      db.close()
+
+    if not response:
+      return { 'error': 'Descuento no encontrado' }, 404
+    
+    return jsonify(response), 200

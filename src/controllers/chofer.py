@@ -14,7 +14,7 @@ class ChoferController:
         try:
             data = request.json
             with db.cursor() as cursor:
-                cursor.callproc('sp_register_chofer', [data['nombre'], data['apellido_pat'], data['apellido_mat'], data['dni'], data['sexo'],0,0,""])
+                cursor.callproc('sp_register_chofer', [data['nombre'], data['apellido_pat'], data['apellido_mat'], data['dni'], data['sexo'], 0, 0, ""])
                 cursor.execute("SELECT @_sp_register_chofer_5 AS last_id, @_sp_register_chofer_6 AS rows_affected, @_sp_register_chofer_7 AS error_message;")
                 result = cursor.fetchone()
                 print(result)
