@@ -121,3 +121,93 @@ BEGIN
   JOIN tipo_servicio_bus tsb ON tsb.id_tipo_servicio_bus = b.id_tipo_servicio_bus
   WHERE tr.id_transaccion = i_id_transaccion;
 END;
+
+
+CREATE PROCEDURE sp_register_transaction_with_tickets(
+  IN i_precio_neto DECIMAL(8, 2),
+  IN i_igv DECIMAL(8, 2),
+  IN i_precio_total DECIMAL(8, 2),
+  IN i_fecha_compra DATETIME,
+  IN i_ruc VARCHAR(20),
+  IN i_correo_contacto VARCHAR(255),
+  IN i_telefono_contacto VARCHAR(20),
+  IN i_id_cliente INT,
+  IN i_id_descuento INT,
+  IN i_id_tipo_boleta INT,
+  IN i_id_metodo_pago INT,
+  IN pasajes_data JSON,
+  OUT error_message VARCHAR(255)
+)
+BEGIN
+  DECLARE last_transaccion_id INT;
+  DECLARE rows_affected INT DEFAULT 0;
+  DECLARE last_pasaje_id INT;
+  DECLARE pasaje_rows_affected INT DEFAULT 0;
+
+  DECLARE EXIT HANDLER FOR SQLEXCEPTION
+  BEGIN
+    -- Capturar el estado SQL y el mensaje de error
+    GET DIAGNOSTICS CONDITION 1 @sqlstate = RETURNED_SQLSTATE, @message = MESSAGE_TEXT;
+    SET error_message = CONCAT('Error: ', @sqlstate, ' - ', @message);
+    ROLLBACK;
+  END;
+
+  -- Iniciar transacción
+  START TRANSACTION;
+
+  -- Etiqueta para el bloque principal
+  main_loop: BEGIN
+
+    -- Registrar transacción
+    CALL sp_register_transaccion(
+      i_precio_neto, i_igv, i_precio_total, i_fecha_compra,
+      i_ruc, i_correo_contacto, i_telefono_contacto, i_id_cliente,
+      i_id_descuento, i_id_tipo_boleta, i_id_metodo_pago,
+      last_transaccion_id, rows_affected, error_message
+    );
+
+    -- Verificar transacción exitosa
+    IF rows_affected <= 0 THEN
+      ROLLBACK;
+      LEAVE main_loop; -- Salir del bloque principal
+    END IF;
+
+    -- Registrar pasajes
+    SET @index = 0;
+    SET @total_pasajes = JSON_LENGTH(pasajes_data);
+
+    WHILE @index < @total_pasajes DO
+      CALL sp_register_pasaje(
+        i_fecha_compra,
+        JSON_UNQUOTE(JSON_EXTRACT(pasajes_data, CONCAT('$[', @index, '].precio_neto'))),
+        JSON_UNQUOTE(JSON_EXTRACT(pasajes_data, CONCAT('$[', @index, '].igv'))),
+        JSON_UNQUOTE(JSON_EXTRACT(pasajes_data, CONCAT('$[', @index, '].precio_total'))),
+        JSON_UNQUOTE(JSON_EXTRACT(pasajes_data, CONCAT('$[', @index, '].id_pasajero'))),
+        JSON_UNQUOTE(JSON_EXTRACT(pasajes_data, CONCAT('$[', @index, '].id_asiento'))),
+        JSON_UNQUOTE(JSON_EXTRACT(pasajes_data, CONCAT('$[', @index, '].id_viaje_programado'))),
+        last_transaccion_id,
+        NULL, -- Fecha de modificación
+        NULL,              -- ID admin mod
+        last_pasaje_id,
+        pasaje_rows_affected,
+        error_message
+      );
+
+      -- Validar pasaje
+      IF pasaje_rows_affected <= 0 THEN
+        SET error_message = 'Error al registrar el pasaje.';
+        ROLLBACK;
+        LEAVE main_loop; -- Salir del bloque principal
+      END IF;
+
+      SET @index = @index + 1;
+    END WHILE;
+
+    -- Finalizar transacción
+    COMMIT;
+    SET error_message = NULL; -- Indicar que no hubo errores
+
+  END main_loop; -- Fin del bloque principal
+
+END
+
