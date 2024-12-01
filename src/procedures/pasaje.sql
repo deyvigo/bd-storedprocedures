@@ -125,7 +125,7 @@ CREATE OR REPLACE FUNCTION fn_get_pasaje_by_id_cliente(
 )
 RETURNS TABLE(
   id_pasaje           INT,
-  precio_total        DECIMAL(8, 2),
+  precio              DECIMAL(8, 2),
   fecha_salida        TIMESTAMP,
   puerto_salida       VARCHAR,
   puerto_destino      VARCHAR,
