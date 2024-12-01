@@ -41,9 +41,10 @@ class LoginController:
       
       # return jwt
       token = create_access_token(identity={
-        'id_admin': admin_in_db.id_admin,
+        'id': admin_in_db.id_admin,
         'username': admin_in_db.username,
-        'fullname': f'{admin_in_db.nombre} {admin_in_db.apellido_pat} {admin_in_db.apellido_mat}'
+        'fullname': f'{admin_in_db.nombre} {admin_in_db.apellido_pat} {admin_in_db.apellido_mat}',
+        'role': 'admin'
       }, expires_delta=timedelta(days=7))
 
       return jsonify({ "message": "Login exitoso", "jwt_token": token }), 200
@@ -78,9 +79,10 @@ class LoginController:
 
       # return jwt
       token = create_access_token(identity={
-        'id_cliente': cliente_in_db.id_cliente,
+        'id': cliente_in_db.id_cliente,
         'username': cliente_in_db.username,
-        'fullname': f'{cliente_in_db.nombre} {cliente_in_db.apellido_pat} {cliente_in_db.apellido_mat}'
+        'fullname': f'{cliente_in_db.nombre} {cliente_in_db.apellido_pat} {cliente_in_db.apellido_mat}',
+        'role': 'client'
       }, expires_delta=timedelta(days=7))
 
       return jsonify({ "message": "Login exitoso", "jwt_token": token }), 200
