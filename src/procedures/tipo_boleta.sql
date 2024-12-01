@@ -53,3 +53,10 @@ BEGIN
   SET error_message = NULL;
   COMMIT;
 END;
+
+CREATE PROCEDURE IF NOT EXISTS sp_get_tipo_boleta_by_tipo(
+  IN  i_tipo varchar(20)
+)
+BEGIN
+  SELECT id_tipo_boleta FROM tipo_boleta WHERE tipo = i_tipo;
+END;
