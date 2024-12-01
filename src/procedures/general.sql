@@ -39,7 +39,7 @@ BEGIN
         (b.asientos-vp.asientos_ocupados) AS asientos_disponibles, 
         r.distancia AS distancia 
     FROM viaje_programado vp
-    INNER JOIN BUS b ON vp.id_bus = b.id_bus
+    INNER JOIN bus b ON vp.id_bus = b.id_bus
     INNER JOIN ruta r ON vp.id_ruta = r.id_ruta
     INNER JOIN terminal t_origen ON r.id_origen = t_origen.id_terminal
     INNER JOIN terminal t_destino ON r.id_destino = t_destino.id_terminal
