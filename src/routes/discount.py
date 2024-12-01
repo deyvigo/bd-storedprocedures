@@ -77,3 +77,27 @@ def edit_discount(id_descuento):
       description: Error al actualizar el descuento
   """
   return DiscountController.edit_discount(id_descuento)
+
+@discount_router.route('/discount/<string:codigo>', methods=['GET'])
+def get_discount_by_codigo(codigo):
+  """
+  Obtener un descuento por codigo
+  ---
+  tags:
+    - Protegido
+  security:
+    - BearerAuth: []
+  parameters:
+    - in: path
+      name: codigo
+      required: true
+      schema:
+        type: string
+        example: "DESC50"
+  responses:
+    200:
+      description: Descuento obtenido
+    404:
+      description: No hay descuento con ese codigo
+  """
+  return DiscountController.get_descuento_by_codigo(codigo)
