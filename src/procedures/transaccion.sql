@@ -152,7 +152,6 @@ BEGIN
 
     -- Verificar transacción exitosa
     IF rows_affected <= 0 THEN
-      SET error_message = 'Error al registrar la transacción.';
       ROLLBACK;
       LEAVE main_loop; -- Salir del bloque principal
     END IF;
@@ -171,7 +170,7 @@ BEGIN
         JSON_UNQUOTE(JSON_EXTRACT(pasajes_data, CONCAT('$[', @index, '].id_asiento'))),
         JSON_UNQUOTE(JSON_EXTRACT(pasajes_data, CONCAT('$[', @index, '].id_viaje_programado'))),
         last_transaccion_id,
-        CURRENT_TIMESTAMP, -- Fecha de modificación
+        NULL, -- Fecha de modificación
         NULL,              -- ID admin mod
         last_pasaje_id,
         pasaje_rows_affected,
@@ -195,3 +194,4 @@ BEGIN
   END main_loop; -- Fin del bloque principal
 
 END
+
