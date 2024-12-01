@@ -67,7 +67,7 @@ CREATE PROCEDURE IF NOT EXISTS sp_get_descuento_by_codigo(
   IN  i_codigo varchar(30)
 )
 BEGIN
-  SELECT id_descuento
+  SELECT *
   FROM descuento
   WHERE codigo = i_codigo;
 END;

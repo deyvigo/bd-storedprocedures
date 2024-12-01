@@ -18,7 +18,7 @@ def draw_ticket_pdf(ticket_data):
   path = os.path.join(os.getcwd(), 'font/SourGummy-Regular.ttf')
   font = ImageFont.truetype(path, 28)
 
-  title = f"BOLETA {ticket_data["id_transaccion"]:016}"
+  title = f"BOLETA {ticket_data['id_transaccion']:016}"
   
   # calculate the width of the text
   bbox = draw.textbbox((0,0), title, font=font)
@@ -86,7 +86,7 @@ def draw_ticket_pdf(ticket_data):
   draw.line((20, current_y, width - 20, current_y), fill=(0, 0, 0), width=2)
 
   # QR code
-  qr_data = f'{ticket_data["pasajero"]}_{ticket_data["dni"]}'
+  qr_data = f"{ticket_data['pasajero']}_{ticket_data['dni']}"
   qr = qrcode.QRCode(
     version=1, 
     error_correction=qrcode.constants.ERROR_CORRECT_L, 
@@ -124,7 +124,7 @@ def draw_ticket_pdf(ticket_data):
   # generate the path to the image file
   directory = os.path.join(os.getcwd(), 'tickets')
 
-  name = f'{ticket_data["pasajero"]}_{hash_name(ticket_data["dni"])}_{ticket_data["fecha_salida"].strftime('%d/%m/%Y')}_{str(ticket_data["hora_salida"])}_{ticket_data["id_pasaje"]}'
+  name = f"{ticket_data['pasajero']}_{hash_name(ticket_data['dni'])}_{ticket_data['fecha_salida'].strftime('%d/%m/%Y')}_{str(ticket_data['hora_salida'])}_{ticket_data['id_pasaje']}"
   hashed_name = hash_name(name)
 
   path = os.path.join(os.getcwd(), f'tickets/{hashed_name}.pdf')

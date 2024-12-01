@@ -22,7 +22,7 @@ def draw_transaccion_pdf(transaction):
   text_width = bbox[2] - bbox[0]
   draw.text(((width - text_width) / 2, 200), brand, fill=(0, 0, 0), font=font)
 
-  title = f"BOLETA {transaction["id_transaccion"]:016}"
+  title = f"BOLETA {transaction['id_transaccion']:016}"
   
   # calculate the width of the text
   bbox = draw.textbbox((0,0), title, font=font)

@@ -1,4 +1,4 @@
-from flask import request
+from flask import jsonify, request
 from flask_jwt_extended import jwt_required
 
 from dto.pasajeroDTO import PasajeroDTO
@@ -41,5 +41,9 @@ class PasajeroController:
 
     if result and result['error_message']:
       return {'error': result['error_message']}, 400
-
-    return {'message': 'Pasajero registrado exitosamente'}, 201 
+    
+    print(result)
+    return jsonify({
+      'message': 'Pasajero registrado',
+      'id_pasajero': result['last_id'],
+    }), 201
