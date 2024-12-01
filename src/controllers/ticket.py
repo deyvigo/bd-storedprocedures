@@ -1,6 +1,7 @@
 from flask import jsonify, send_file, abort
 from flask_jwt_extended import jwt_required, get_jwt_identity
 import os
+from psycopg2.extras import RealDictCursor
 
 from services.database import Database
 from services.createTicketPDF import draw_ticket_pdf
@@ -13,7 +14,7 @@ class TicketController:
     db = Database().connection()
 
     try:
-      with db.cursor() as cursor:
+      with db.cursor(cursor_factory=RealDictCursor) as cursor:
         cursor.callproc('fn_get_pasaje_by_id_cliente', [client['id_cliente']])
         response = cursor.fetchall()
     except Exception as e:
@@ -35,8 +36,8 @@ class TicketController:
     db = Database().connection()
 
     try:
-      with db.cursor() as cursor:
-        cursor.callproc('sp_get_print_pasaje_by_id_pasaje', [id_pasaje])
+      with db.cursor(cursor_factory=RealDictCursor) as cursor:
+        cursor.callproc('fn_get_pasaje_by_id_pasaje_for_pdf', [id_pasaje])
         response = cursor.fetchone()
     except Exception as e:
       return { 'error': f'No se pudo obtener el PDF del boleto. {e}' }, 400

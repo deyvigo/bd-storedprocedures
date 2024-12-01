@@ -139,10 +139,10 @@ BEGIN
   SELECT
     p.id_pasaje,
     p.precio_total as precio,
-    vp.fecha_salida,
+    vp.fecha_salida::TIMESTAMP as fecha_salida,
     te_origen.nombre as puerto_salida,
     te_destino.nombre as puerto_destino,
-    CONCAT(pa.nombre, ', ', pa.apellido_pat, ' ', pa.apellido_mat) as nombre_pasajero,
+    CONCAT(pa.nombre, ', ', pa.apellido_pat, ' ', pa.apellido_mat)::VARCHAR as nombre_pasajero,
     vp.hora_salida,
     t.fecha_compra
   FROM pasaje p
@@ -155,5 +155,59 @@ BEGIN
   JOIN cliente c ON c.id_cliente =  t.id_cliente
   WHERE c.id_cliente = i_id_cliente
   ORDER BY t.fecha_compra ASC;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION fn_get_pasaje_by_id_pasaje_for_pdf(
+  i_id_pasaje INT
+)
+RETURNS TABLE(
+  id_transaccion   INT,
+  id_pasaje        INT,
+  embarque         VARCHAR,
+  desembarque      VARCHAR,
+  fecha_salida     TIMESTAMP,
+  hora_salida      TIME,
+  asiento          INT,
+  piso             INT,
+  servicio         VARCHAR,
+  pasajero         VARCHAR,
+  dni              VARCHAR,
+  precio_neto      DECIMAL(8, 2),
+  igv              DECIMAL(8, 2),
+  precio_total     DECIMAL(8, 2),
+  numero_tarjeta   VARCHAR
+)
+AS $$
+BEGIN
+  RETURN QUERY
+  SELECT
+    t.id_transaccion,
+    p.id_pasaje,
+    CONCAT(te_origen.nombre, ' - ', te_origen.departamento)::VARCHAR as embarque,
+    CONCAT(te_destino.nombre, ' - ', te_destino.departamento)::VARCHAR as desembarque,
+    vp.fecha_salida::TIMESTAMP as fecha_salida,
+    vp.hora_salida,
+    a.numero as asiento,
+    a.nivel as piso,
+    tsb.servicio,
+    CONCAT(pa.nombre, ', ', pa.apellido_pat, ' ', pa.apellido_mat)::VARCHAR as pasajero,
+    pa.dni,
+    p.precio_neto,
+    p.igv,
+    p.precio_total,
+    mp.numero_tarjeta
+  FROM pasaje p
+  JOIN viaje_programado vp ON vp.id_viaje_programado = p.id_viaje_programado
+  JOIN asiento a ON a.id_asiento = p.id_asiento
+  JOIN bus b ON b.id_bus = vp.id_bus
+  JOIN tipo_servicio_bus tsb ON tsb.id_tipo_servicio_bus = b.id_tipo_servicio_bus
+  JOIN ruta r ON r.id_ruta = vp.id_ruta
+  JOIN terminal te_origen ON te_origen.id_terminal = r.id_origen
+  JOIN terminal te_destino ON te_destino.id_terminal = r.id_destino
+  JOIN pasajero pa ON pa.id_pasajero = p.id_pasajero
+  JOIN transaccion t ON t.id_transaccion = p.id_transaccion
+  JOIN metodo_pago mp ON mp.id_metodo_pago = t.id_metodo_pago
+  WHERE p.id_pasaje = i_id_pasaje;
 END;
 $$ LANGUAGE plpgsql;
