@@ -13,3 +13,6 @@ class AdminDTO(BaseModel):
   correo: EmailStr
   username: constr(min_length=3, max_length=50)
   password: constr(min_length=8, max_length=80)
+
+class AdminCreateDTO(BaseModel):
+  username: constr(min_length=1, max_length=255)

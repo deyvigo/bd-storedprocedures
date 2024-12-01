@@ -14,3 +14,4 @@ from .terminalCreate import terminalCreate_router
 from .ruta import ruta_router
 from .asiento import asiento_router
 from .tipoBoleta import tipo_boleta_router
+from .admin import admin_router

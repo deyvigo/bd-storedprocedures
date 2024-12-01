@@ -67,7 +67,7 @@ class ControllerGeneral:
         cursor.callproc('sp_get_scheduled_trip',[request.json['ciudad_origen'], request.json['ciudad_destino'],request.json['fecha']])
         response = cursor.fetchall()
     except Exception as e:
-      return jsonify({'error': f'No se pudo obtener la información de los viajes programados en la ruta {request.json['ciudad_origen']} a {request.json['ciudad_destino']} en fecha {request.json['fecha']}. {e}'}), 500
+      return jsonify({'error': f"No se pudo obtener la información de los viajes programados en la ruta {request.json['ciudad_origen']} a {request.json['ciudad_destino']} en fecha {request.json['fecha']}. {e}"}), 500
     finally:
       db.close()
     print(response)
