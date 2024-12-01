@@ -123,7 +123,7 @@ BEGIN
 END;
 
 
-CREATE PROCEDURE sp_register_transaction_with_tickets(
+CREATE PROCEDURE IF NOT EXISTS sp_register_transaction_with_tickets(
   IN i_precio_neto DECIMAL(8, 2),
   IN i_igv DECIMAL(8, 2),
   IN i_precio_total DECIMAL(8, 2),
