@@ -3,6 +3,29 @@ from flask import Blueprint
 from controllers.general import ControllerGeneral
 general_router = Blueprint('general', __name__)
 
+@general_router.route('/general/origins', methods=['GET'])
+def get_origins_available():
+  """
+    Obtener ciudades disponibles
+    ---
+    tags:
+      - Protegido
+    security:
+      - BearerAuth: []
+    responses:
+      200:
+        description: Ciudades disponibles
+        schema:
+          type: array
+          items:
+            type: object
+            properties:
+              ciudad:
+                type: string
+                example: "Lima"
+  """
+  return ControllerGeneral.get_origins_available()
+
 @general_router.route('/general/destination', methods=['POST'])
 def get_destination_by_city():
   """
@@ -140,8 +163,8 @@ def get_scheduled_trip():
                 format: time
                 example: "11:00:00"
               duracion:
-                type: integer
-                example: 60
+                type: time
+                example: "12:00:00"
               precio_min:
                 type: float
                 example: 120.00
