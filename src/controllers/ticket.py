@@ -46,6 +46,7 @@ class TicketController:
     try:
       ticket_name =draw_ticket_pdf(response)
     except Exception as e:
+      print(e)
       return { 'error': f'No se pudo generar el PDF del boleto. {e}' }, 400
     
     return { 'message': 'PDF generado', 'ticket_name': ticket_name }, 200
