@@ -201,10 +201,11 @@ for i in range(n_clients):
     
     # details -> pasaje only one passenger
     details = fake.random_element([1, 2, 3, 4])
+
+    # select viaje_programado. Only one destiny trip per transaction
+    viaje_programado = fake.random_element(trips)
+
     for _ in range(details):
-      
-      # select viaje_programado
-      viaje_programado = fake.random_element(trips)
       id_viaje_programado = viaje_programado['id_viaje_programado']
 
       passenger_args = fake.random_element(passengers)
