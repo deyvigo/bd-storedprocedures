@@ -9,10 +9,14 @@ create table if not exists admin
   dni              varchar(8)   not null CHECK (LENGTH(dni) = 8),
   sexo             varchar(15)  not null CHECK (sexo IN ('masculino', 'femenino')),
   telefono         varchar(9)   not null CHECK (LENGTH(telefono) = 9),
-  correo           varchar(255) not null UNIQUE,
-  username         varchar(50)  not null UNIQUE,
+  correo           varchar(255) not null ,
+  username         varchar(50)  not null ,
   password         varchar(80)  not null
 );
+
+CREATE UNIQUE INDEX idx_admin_dni ON admin (dni);
+CREATE UNIQUE INDEX idx_admin_correo ON admin (correo);
+CREATE UNIQUE INDEX idx_admin_username ON admin (username);
 
 create table if not exists chofer
 (
@@ -21,32 +25,38 @@ create table if not exists chofer
   nombre       varchar(255) not null,
   apellido_pat varchar(50)  not null,
   apellido_mat varchar(50)  not null,
-  dni          varchar(8)   not null UNIQUE CHECK (LENGTH(dni) = 8),
+  dni          varchar(8)   not null CHECK (LENGTH(dni) = 8),
   sexo         varchar(15)  not null CHECK (sexo IN ('masculino', 'femenino')),
   estado       varchar(20)  not null CHECK (estado IN ('contratado', 'despedido')) default 'contratado'
 );
+
+CREATE UNIQUE INDEX idx_chofer_dni ON chofer (dni);
 
 create table if not exists cliente
 (
   id_cliente       int auto_increment
     primary key,
-  dni              varchar(8)   not null UNIQUE CHECK (LENGTH(dni) = 8),
+  dni              varchar(8)   not null  CHECK (LENGTH(dni) = 8),
   nombre           varchar(255) not null,
   apellido_pat     varchar(50)  not null,
   apellido_mat     varchar(50)  not null,
   fecha_nacimiento date         not null,
   sexo             varchar(15)  not null CHECK (sexo IN ('masculino', 'femenino')),
   telefono         varchar(20)  not null CHECK (LENGTH(telefono) = 9),
-  correo           varchar(100) not null UNIQUE,
-  username         varchar(50)  not null UNIQUE,
+  correo           varchar(100) not null ,
+  username         varchar(50)  not null ,
   password         varchar(80)  not null
 );
+
+CREATE UNIQUE INDEX idx_cliente_dni ON cliente (dni);
+CREATE UNIQUE INDEX idx_cliente_correo ON cliente (correo);
+CREATE UNIQUE INDEX idx_cliente_username ON cliente (username);
 
 create table if not exists descuento
 (
   id_descuento int auto_increment
     primary key,
-  codigo       varchar(30)   not null UNIQUE,
+  codigo       varchar(30)   not null ,
   monto        decimal(8, 2) not null CHECK (monto > 0),
   estado       varchar(20)   not null default 'activo' CHECK (estado IN ('activo', 'inactivo')),
   id_admin     int           not null,
@@ -54,15 +64,18 @@ create table if not exists descuento
     foreign key (id_admin) references admin (id_admin)
 );
 
+CREATE UNIQUE INDEX idx_descuento_codigo ON descuento (codigo);
+
 create table if not exists metodo_pago
 (
   id_metodo_pago    int auto_increment
     primary key,
   nombre            varchar(50) not null,
-  numero_tarjeta    varchar(16) not null UNIQUE CHECK (LENGTH(numero_tarjeta) = 16),
+  numero_tarjeta    varchar(16) not null CHECK (LENGTH(numero_tarjeta) = 16),
   estado            varchar(20) not null default 'activo' CHECK (estado IN ('activo', 'inactivo')),
   id_cliente        int         not null
 );
+
 
 create table if not exists pasajero
 (
@@ -75,6 +88,8 @@ create table if not exists pasajero
   fecha_nacimiento date         not null,
   sexo             varchar(15)  not null CHECK (sexo IN ('masculino', 'femenino'))
 );
+
+CREATE UNIQUE INDEX idx_pasajero_dni ON pasajero (dni);
 
 create table if not exists terminal
 (
@@ -137,6 +152,8 @@ create table if not exists bus
   constraint bus_tipo_servicio_bus_id_tipo_servicio_bus_fk
     foreign key (id_tipo_servicio_bus) references tipo_servicio_bus (id_tipo_servicio_bus)
 );
+
+CREATE UNIQUE INDEX idx_bus_placa ON bus (placa);
 
 create table if not exists asiento
 (
