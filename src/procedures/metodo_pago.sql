@@ -99,7 +99,7 @@ RETURNS TABLE(
 AS $$
 BEGIN
   RETURN QUERY
-  SELECT * FROM metodo_pago mp WHERE mp.id_cliente = i_id_cliente AND mp.estado = 'activo';
+  SELECT mp.id_metodo_pago, mp.nombre, mp.estado, mp.numero_tarjeta, mp.id_cliente FROM metodo_pago mp WHERE mp.id_cliente = i_id_cliente AND mp.estado = 'activo';
 END;
 $$ LANGUAGE plpgsql;
 
