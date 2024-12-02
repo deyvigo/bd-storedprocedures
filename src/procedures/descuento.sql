@@ -67,7 +67,20 @@ CREATE PROCEDURE IF NOT EXISTS sp_get_descuento_by_codigo(
   IN  i_codigo varchar(30)
 )
 BEGIN
-  SELECT *
+  DECLARE v_estado varchar(30);
+  
+  SELECT estado INTO v_estado
   FROM descuento
   WHERE codigo = i_codigo;
+
+  IF v_estado = 'activo' THEN 
+    SELECT *
+    FROM descuento
+    WHERE codigo = i_codigo;
+
+    UPDATE descuento
+    SET estado = 'inactivo'
+    WHERE codigo = i_codigo;
+    COMMIT;
+  END IF;
 END;
