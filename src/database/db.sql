@@ -23,7 +23,7 @@ create table if not exists chofer
   apellido_mat varchar(50)  not null,
   dni          varchar(8)   not null UNIQUE CHECK (LENGTH(dni) = 8),
   sexo         varchar(15)  not null CHECK (sexo IN ('masculino', 'femenino')),
-  estado       varchar(20)  not null CHECK (estado IN ('contratado', 'despedido')) default 'contratado'
+  estado       varchar(20)  not null default 'contratado' CHECK (estado IN ('contratado', 'despedido'))
 );
 
 create table if not exists cliente
